@@ -341,3 +341,35 @@ function Card({
     </div>
   );
 }
+<button
+
+  onClick={() => {
+
+    localStorage.removeItem(
+      "token"
+    );
+
+    window.location.href =
+      "/login";
+  }}
+
+  style={{
+    background: "#ef4444",
+
+    color: "white",
+
+    border: "none",
+
+    padding: "10px 20px",
+
+    borderRadius: "10px",
+
+    cursor: "pointer",
+
+    marginBottom: "20px"
+  }}
+>
+
+  Logout
+
+</button>

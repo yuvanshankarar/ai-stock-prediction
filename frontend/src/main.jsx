@@ -1,11 +1,13 @@
 import React from "react";
+
 import ReactDOM from "react-dom/client";
 
 import {
 
   BrowserRouter,
   Routes,
-  Route
+  Route,
+  Navigate
 
 } from "react-router-dom";
 
@@ -13,6 +15,27 @@ import App from "./App";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+
+
+// PROTECTED ROUTE
+function ProtectedRoute({
+
+  children
+
+}) {
+
+  const token =
+    localStorage.getItem(
+      "token"
+    );
+
+  return token
+
+    ? children
+
+    : <Navigate to="/login" />;
+}
+
 
 ReactDOM.createRoot(
   document.getElementById("root")
@@ -25,8 +48,17 @@ ReactDOM.createRoot(
       <Routes>
 
         <Route
+
           path="/"
-          element={<App />}
+
+          element={
+
+            <ProtectedRoute>
+
+              <App />
+
+            </ProtectedRoute>
+          }
         />
 
         <Route
