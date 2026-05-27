@@ -6,10 +6,13 @@ from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import load_model
 
 # LOAD MODEL
-model = load_model(
-    "backend/models/stock_model.h5",
-    compile=False   # ✅ FIX
-)
+def predict_price(symbol):
+
+    model = load_model(
+        "backend/models/stock_model.h5"
+    )
+
+    ...
 
 
 def predict_price(symbol):
