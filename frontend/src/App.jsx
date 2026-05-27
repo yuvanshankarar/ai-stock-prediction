@@ -4,6 +4,7 @@ import React, {
 } from "react";
 
 import axios from "axios";
+import StockChart from "./components/StockChart";
 
 import WatchlistSidebar from "./components/WatchlistSidebar";
 
@@ -173,17 +174,81 @@ export default function App() {
 
             </div>
 
-            {/* STOCK DETAILS */}
+           {/* STOCK DETAILS */}
 
-            <div
-              style={{
-                background: "#111827",
+<div
+  style={{
+    background: "#111827",
 
-                padding: "30px",
+    padding: "30px",
 
-                borderRadius: "20px"
-              }}
-            >
+    borderRadius: "20px"
+  }}
+>
+
+  <h1
+    style={{
+      marginBottom: "20px"
+    }}
+  >
+    {stockData.symbol}
+  </h1>
+
+  <h2>
+    Current Price:
+    {" "}
+    ${stockData.price?.toFixed(2)}
+  </h2>
+
+  <h3>
+    Day High:
+    {" "}
+    ${stockData.day_high?.toFixed(2)}
+  </h3>
+
+  <h3>
+    Day Low:
+    {" "}
+    ${stockData.day_low?.toFixed(2)}
+  </h3>
+
+  <h3>
+    Volume:
+    {" "}
+    {stockData.volume?.toLocaleString()}
+  </h3>
+
+</div>
+
+{/* STOCK CHART */}
+
+<div
+  style={{
+    marginTop: "30px",
+
+    background: "#111827",
+
+    padding: "20px",
+
+    borderRadius: "20px"
+  }}
+>
+
+  <h2
+    style={{
+      marginBottom: "20px"
+    }}
+  >
+    Stock Chart 📈
+  </h2>
+
+  <StockChart
+    data={
+      stockData.chart_data
+    }
+  />
+
+</div>
 
               <h1
                 style={{
