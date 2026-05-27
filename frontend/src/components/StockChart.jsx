@@ -1,133 +1,102 @@
-import React, {
-  useEffect,
-  useRef
-} from "react";
+import React from "react";
 
 import {
-  createChart
-} from "lightweight-charts";
+
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid
+
+} from "recharts";
 
 export default function StockChart({
-  data,
-  liveCandle
+  data
 }) {
 
-  const chartContainerRef =
-    useRef(null);
+  if (!data || data.length === 0) {
 
-  const candleSeriesRef =
-    useRef(null);
+    return (
 
-  const chartRef =
-    useRef(null);
-
-  // INITIAL CHART
-  useEffect(() => {
-
-    if (!chartContainerRef.current)
-      return;
-
-    const chart = createChart(
-      chartContainerRef.current,
-      {
-        width:
-          chartContainerRef.current
-            .clientWidth,
-
-        height: 500,
-
-        layout: {
-
-          background: {
-            color: "#111827"
-          },
-
-          textColor: "#FFFFFF"
-        },
-
-        grid: {
-
-          vertLines: {
-            color: "#1f2937"
-          },
-
-          horzLines: {
-            color: "#1f2937"
-          }
-        }
-      }
+      <div
+        style={{
+          color: "white"
+        }}
+      >
+        No chart data available
+      </div>
     );
-
-    chartRef.current = chart;
-
-    const candleSeries =
-      chart.addCandlestickSeries();
-
-    candleSeriesRef.current =
-      candleSeries;
-
-    if (data && data.length > 0) {
-
-      const formattedData =
-        data.map((item) => ({
-
-          time:
-            item.date.split(" ")[0],
-
-          open: item.open,
-
-          high: item.high,
-
-          low: item.low,
-
-          close: item.close
-        }));
-
-      candleSeries.setData(
-        formattedData
-      );
-    }
-
-    chart.timeScale().fitContent();
-
-    return () => {
-      chart.remove();
-    };
-
-  }, [data]);
-
-  // LIVE CANDLE UPDATE
-  useEffect(() => {
-
-    if (
-      !liveCandle ||
-      !candleSeriesRef.current
-    ) return;
-
-    candleSeriesRef.current.update({
-
-      time:
-        liveCandle.time.split(" ")[0],
-
-      open: liveCandle.open,
-
-      high: liveCandle.high,
-
-      low: liveCandle.low,
-
-      close: liveCandle.close
-    });
-
-  }, [liveCandle]);
+  }
 
   return (
 
     <div
-      ref={chartContainerRef}
       style={{
         width: "100%",
-        height: "500px"
+
+        height: "400px"
       }}
-    />
+    >
+
+      <ResponsiveContainer>
+
+        <LineChart
+          data={data}
+        >
+
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#334155"
+          />
+
+          <XAxis
+            dataKey="date"
+
+            stroke="#94a3b8"
+          />
+
+          <YAxis
+            stroke="#94a3b8"
+
+            domain={["auto", "auto"]}
+          />
+
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#111827",
+
+              border:
+                "1px solid #334155",
+
+              borderRadius: "10px",
+
+              color: "white"
+            }}
+          />
+
+          <Line
+
+            type="monotone"
+
+            dataKey="close"
+
+            stroke="#22c55e"
+
+            strokeWidth={3}
+
+            dot={false}
+
+            activeDot={{
+              r: 6
+            }}
+          />
+
+        </LineChart>
+
+      </ResponsiveContainer>
+
+    </div>
   );
 }

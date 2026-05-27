@@ -5,6 +5,7 @@ import React, {
 
 import axios from "axios";
 import StockChart from "./components/StockChart";
+import TradePanel from "./components/TradePanel";
 
 import WatchlistSidebar from "./components/WatchlistSidebar";
 
@@ -249,7 +250,14 @@ export default function App() {
   />
 
 </div>
+<TradePanel
 
+  symbol={stockData.symbol}
+
+  currentPrice={
+    stockData.price
+  }
+/>
               <h1
                 style={{
                   marginBottom: "20px"

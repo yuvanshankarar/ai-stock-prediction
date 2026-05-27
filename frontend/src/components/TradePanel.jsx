@@ -1,293 +1,181 @@
 import React, {
-  useEffect,
   useState
 } from "react";
-
-import axios from "axios";
 
 export default function TradePanel({
 
   symbol,
+
   currentPrice
 
 }) {
 
-  const API =
-    import.meta.env.VITE_API_URL;
+  const [balance, setBalance] =
+    useState(10000);
 
   const [shares, setShares] =
-    useState(1);
+    useState("");
 
-  const [tradeData, setTradeData] =
-    useState(null);
+  const [portfolio, setPortfolio] =
+    useState([]);
 
-  // FETCH TRADES
-  async function fetchTrades() {
+  function buyStock() {
 
-    try {
+    const qty = Number(shares);
 
-      const res = await axios.get(
-        `${API}/trades`
+    const cost =
+      qty * currentPrice;
+
+    if (
+
+      qty <= 0 ||
+
+      cost > balance
+
+    ) {
+
+      alert(
+        "Invalid trade"
       );
 
-      setTradeData(res.data);
-
-    } catch (err) {
-
-      console.error(err);
+      return;
     }
+
+    setBalance(
+      balance - cost
+    );
+
+    setPortfolio([
+
+      ...portfolio,
+
+      {
+
+        symbol,
+
+        shares: qty,
+
+        price: currentPrice
+      }
+    ]);
+
+    setShares("");
   }
-
-  // PLACE TRADE
-  async function placeTrade(action) {
-
-    try {
-
-      await axios.post(
-
-        `${API}/trade`,
-
-        null,
-
-        {
-          params: {
-
-            symbol,
-
-            action,
-
-            shares,
-
-            price: currentPrice
-          }
-        }
-      );
-
-      fetchTrades();
-
-    } catch (err) {
-
-      console.error(err);
-    }
-  }
-
-  useEffect(() => {
-
-    fetchTrades();
-
-  }, []);
 
   return (
 
     <div
       style={{
-        marginTop: "30px",
-
         background: "#111827",
 
         padding: "20px",
 
-        borderRadius: "20px"
+        borderRadius: "20px",
+
+        marginTop: "30px"
       }}
     >
 
-      <h1>
-        Paper Trading 💹
-      </h1>
+      <h2>
+        Paper Trading 💰
+      </h2>
 
-      {/* BALANCE */}
+      <h3>
+        Balance:
+        {" "}
+        ${balance.toFixed(2)}
+      </h3>
 
-      {tradeData && (
+      <input
 
-        <div
-          style={{
-            marginBottom: "20px"
-          }}
-        >
+        type="number"
 
-          <h2>
-            Balance:
-            {" "}
-            $
-            {tradeData.current_balance}
-          </h2>
+        placeholder="Shares"
 
-        </div>
-      )}
+        value={shares}
 
-      {/* TRADE CONTROLS */}
+        onChange={(e) =>
+          setShares(
+            e.target.value
+          )
+        }
 
-      <div
         style={{
-          display: "flex",
+          padding: "10px",
 
-          gap: "10px",
+          marginTop: "10px",
 
-          alignItems: "center",
+          width: "100%",
 
-          marginBottom: "20px"
+          borderRadius: "10px",
+
+          border: "none"
+        }}
+      />
+
+      <button
+
+        onClick={buyStock}
+
+        style={{
+          marginTop: "15px",
+
+          background: "#22c55e",
+
+          color: "white",
+
+          padding:
+            "12px 20px",
+
+          border: "none",
+
+          borderRadius: "10px",
+
+          cursor: "pointer",
+
+          width: "100%"
         }}
       >
 
-        <input
+        Buy {symbol}
 
-          type="number"
+      </button>
 
-          value={shares}
+      <div
+        style={{
+          marginTop: "20px"
+        }}
+      >
 
-          onChange={(e) =>
-            setShares(
-              Number(e.target.value)
-            )
-          }
+        {portfolio.map(
 
-          min="1"
+          (trade, index) => (
 
-          style={{
-            padding: "10px",
+            <div
+              key={index}
 
-            borderRadius: "10px",
+              style={{
+                background: "#1e293b",
 
-            border: "none",
+                padding: "10px",
 
-            width: "120px"
-          }}
-        />
+                borderRadius: "10px",
 
-        <button
+                marginBottom: "10px"
+              }}
+            >
 
-          onClick={() =>
-            placeTrade("BUY")
-          }
+              {trade.symbol}
+              {" — "}
+              {trade.shares}
+              {" shares @ $"}
+              {trade.price.toFixed(2)}
 
-          style={{
-            background: "#22c55e",
-
-            color: "white",
-
-            border: "none",
-
-            padding: "10px 20px",
-
-            borderRadius: "10px",
-
-            cursor: "pointer"
-          }}
-        >
-          BUY
-        </button>
-
-        <button
-
-          onClick={() =>
-            placeTrade("SELL")
-          }
-
-          style={{
-            background: "#ef4444",
-
-            color: "white",
-
-            border: "none",
-
-            padding: "10px 20px",
-
-            borderRadius: "10px",
-
-            cursor: "pointer"
-          }}
-        >
-          SELL
-        </button>
+            </div>
+          )
+        )}
 
       </div>
-
-      {/* TRADE HISTORY */}
-
-      {tradeData && (
-
-        <div>
-
-          <h2>
-            Trade History
-          </h2>
-
-          <table
-            style={{
-              width: "100%",
-
-              borderCollapse:
-                "collapse"
-            }}
-          >
-
-            <thead>
-
-              <tr>
-
-                <th>Symbol</th>
-
-                <th>Action</th>
-
-                <th>Shares</th>
-
-                <th>Price</th>
-
-                <th>Value</th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {tradeData.trades.map(
-                (trade, index) => (
-
-                  <tr
-                    key={index}
-                  >
-
-                    <td>
-                      {trade.symbol}
-                    </td>
-
-                    <td
-                      style={{
-                        color:
-                          trade.action ===
-                          "BUY"
-
-                            ? "#22c55e"
-
-                            : "#ef4444"
-                      }}
-                    >
-                      {trade.action}
-                    </td>
-
-                    <td>
-                      {trade.shares}
-                    </td>
-
-                    <td>
-                      ${trade.price}
-                    </td>
-
-                    <td>
-                      ${trade.value}
-                    </td>
-
-                  </tr>
-                )
-              )}
-
-            </tbody>
-
-          </table>
-
-        </div>
-      )}
 
     </div>
   );
