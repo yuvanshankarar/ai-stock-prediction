@@ -2,11 +2,6 @@ from fastapi import APIRouter
 from fastapi import HTTPException
 
 import yfinance as yf
-import pandas as pd
-
-from backend.services.indicators import (
-    add_indicators
-)
 
 router = APIRouter()
 
@@ -16,169 +11,29 @@ def get_stock(symbol: str):
 
     try:
 
-        # FETCH STOCK DATA
         ticker = yf.Ticker(symbol)
 
-        df = ticker.history(
-
-            period="3mo",
-
-            interval="1d",
-
-            auto_adjust=True
-        )
-
-        # EMPTY CHECK
-        if df.empty:
-
-            raise HTTPException(
-
-                status_code=404,
-
-                detail="Yahoo Finance rate limit or invalid stock"
-            )
-
-        # RESET INDEX
-        df = df.reset_index()
-
-        # FIX MULTIINDEX
-        if isinstance(
-            df.columns,
-            pd.MultiIndex
-        ):
-
-            df.columns = (
-                df.columns
-                .get_level_values(0)
-            )
-
-        # CHECK CLOSE
-        if "Close" not in df.columns:
-
-            raise HTTPException(
-
-                status_code=500,
-
-                detail="Close column missing"
-            )
-
-        # ADD INDICATORS
-        df = add_indicators(df)
-
-        # REMOVE NaN
-        df = df.dropna()
-
-        latest = df.iloc[-1]
-
-        # SIGNAL
-        rsi = latest["rsi"]
-
-        if rsi < 30:
-
-            signal = "BUY"
-
-        elif rsi > 70:
-
-            signal = "SELL"
-
-        else:
-
-            signal = "HOLD"
-
-        # MOCK PREDICTION
-        prediction = (
-            float(latest["Close"]) * 1.02
-        )
-
-        # MOCK AI RECOMMENDATION
-        recommendation_data = {
-
-            "recommendation":
-                signal,
-
-            "confidence":
-                75,
-
-            "reasons": [
-
-                "Technical indicators analyzed",
-
-                "Cloud deployment mode"
-            ]
-        }
-
-        # CHART DATA
-        chart_data = [
-
-            {
-
-                "date":
-                    str(row["Date"]),
-
-                "open":
-                    float(row["Open"]),
-
-                "high":
-                    float(row["High"]),
-
-                "low":
-                    float(row["Low"]),
-
-                "close":
-                    float(row["Close"]),
-
-                "volume":
-                    int(row["Volume"]),
-
-                "rsi":
-                    float(row["rsi"]),
-
-                "macd":
-                    float(row["macd"]),
-
-                "macd_signal":
-                    float(row["macd_signal"])
-            }
-
-            for _, row in df.iterrows()
-        ]
+        info = ticker.fast_info
 
         return {
 
             "symbol":
                 symbol.upper(),
 
-            "latest_close":
-                float(latest["Close"]),
+            "price":
+                info.get("lastPrice"),
 
-            "rsi":
-                float(latest["rsi"]),
+            "day_high":
+                info.get("dayHigh"),
 
-            "macd":
-                float(latest["macd"]),
+            "day_low":
+                info.get("dayLow"),
 
-            "macd_signal":
-                float(latest["macd_signal"]),
-
-            "signal":
-                signal,
-
-            "predicted_price":
-                prediction,
-
-            "recommendation":
-                recommendation_data,
-
-            "chart_data":
-                chart_data
+            "volume":
+                info.get("lastVolume")
         }
 
     except Exception as e:
-
-        print(
-            "Stock Route Error:",
-            e
-        )
 
         raise HTTPException(
 
