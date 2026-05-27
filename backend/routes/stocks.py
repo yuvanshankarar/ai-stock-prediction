@@ -4,18 +4,6 @@ from fastapi import HTTPException
 import yfinance as yf
 import pandas as pd
 
-import requests_cache
-
-from requests_ratelimiter import (
-    LimiterSession
-)
-
-from pyrate_limiter import (
-    Duration,
-    RequestRate,
-    Limiter
-)
-
 from backend.services.indicators import (
     add_indicators
 )
@@ -23,45 +11,21 @@ from backend.services.indicators import (
 router = APIRouter()
 
 
-# CACHE + RATE LIMIT SESSION
-session = LimiterSession(
-
-    limiter=Limiter(
-
-        RequestRate(
-
-            2,
-
-            Duration.SECOND * 5
-        )
-    )
-)
-
-# FAKE BROWSER HEADERS
-session.headers[
-    "User-agent"
-] = "Mozilla/5.0"
-
-
 @router.get("/stock/{symbol}")
 def get_stock(symbol: str):
 
     try:
 
-        # YFINANCE TICKER
-        ticker = yf.Ticker(
+        # FETCH STOCK DATA
+        ticker = yf.Ticker(symbol)
 
-            symbol,
-
-            session=session
-        )
-
-        # FETCH DATA
         df = ticker.history(
 
-            period="6mo",
+            period="3mo",
 
-            interval="1d"
+            interval="1d",
+
+            auto_adjust=True
         )
 
         # EMPTY CHECK
@@ -71,7 +35,7 @@ def get_stock(symbol: str):
 
                 status_code=404,
 
-                detail="No stock data found"
+                detail="Yahoo Finance rate limit or invalid stock"
             )
 
         # RESET INDEX
@@ -88,7 +52,7 @@ def get_stock(symbol: str):
                 .get_level_values(0)
             )
 
-        # VALIDATE CLOSE
+        # CHECK CLOSE
         if "Close" not in df.columns:
 
             raise HTTPException(
@@ -101,12 +65,12 @@ def get_stock(symbol: str):
         # ADD INDICATORS
         df = add_indicators(df)
 
-        # DROP NaN
+        # REMOVE NaN
         df = df.dropna()
 
         latest = df.iloc[-1]
 
-        # SIGNAL LOGIC
+        # SIGNAL
         rsi = latest["rsi"]
 
         if rsi < 30:
@@ -139,7 +103,7 @@ def get_stock(symbol: str):
 
                 "Technical indicators analyzed",
 
-                "Deployment mode active"
+                "Cloud deployment mode"
             ]
         }
 
