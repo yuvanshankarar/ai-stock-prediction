@@ -5,11 +5,7 @@ import React, {
 
 import axios from "axios";
 
-import StockChart from "./components/StockChart";
-import Portfolio from "./components/Portfolio";
-import NewsPanel from "./components/NewsPanel";
 import WatchlistSidebar from "./components/WatchlistSidebar";
-import TradePanel from "./components/TradePanel";
 
 export default function App() {
 
@@ -19,14 +15,6 @@ export default function App() {
 
   // STOCK DATA
   const [stockData, setStockData] =
-    useState(null);
-
-  // LIVE PRICE
-  const [livePrice, setLivePrice] =
-    useState(null);
-
-  // LIVE CANDLE
-  const [liveCandle, setLiveCandle] =
     useState(null);
 
   // LOADING
@@ -67,57 +55,6 @@ export default function App() {
   useEffect(() => {
 
     fetchStock(selectedStock);
-
-  }, [selectedStock]);
-
-  // WEBSOCKET
-  useEffect(() => {
-
-    const ws = new WebSocket(
-      `ws://127.0.0.1:8000/ws/${selectedStock}`
-    );
-
-    ws.onopen = () => {
-
-      console.log(
-        "WebSocket Connected"
-      );
-    };
-
-    ws.onmessage = (event) => {
-
-      const data =
-        JSON.parse(event.data);
-
-      console.log("LIVE:", data);
-
-      if (!data.error) {
-
-        setLivePrice(data.close);
-
-        setLiveCandle(data);
-      }
-    };
-
-    ws.onerror = (error) => {
-
-      console.error(
-        "WebSocket Error:",
-        error
-      );
-    };
-
-    ws.onclose = () => {
-
-      console.log(
-        "WebSocket Closed"
-      );
-    };
-
-    return () => {
-
-      ws.close();
-    };
 
   }, [selectedStock]);
 
@@ -205,272 +142,82 @@ export default function App() {
             >
 
               <Card
-                title="Live Price"
+                title="Current Price"
 
-                value={
-                  livePrice !== null
-                    ? `$${livePrice.toFixed(2)}`
-                    : "Loading..."
-                }
+                value={`$${stockData.price?.toFixed(2)}`}
 
                 color="#22c55e"
               />
 
               <Card
-                title="Predicted Price"
+                title="Day High"
 
-                value={
-                  stockData.predicted_price
-                    ? `$${stockData.predicted_price.toFixed(2)}`
-                    : "N/A"
-                }
+                value={`$${stockData.day_high?.toFixed(2)}`}
               />
 
               <Card
-                title="RSI"
+                title="Day Low"
 
-                value={
-                  stockData.rsi.toFixed(2)
-                }
+                value={`$${stockData.day_low?.toFixed(2)}`}
               />
 
               <Card
-                title="Signal"
+                title="Volume"
 
                 value={
-                  stockData.signal
+                  stockData.volume?.toLocaleString()
                 }
 
-                color={
-                  stockData.signal === "BUY"
-                    ? "#22c55e"
-                    : stockData.signal === "SELL"
-                    ? "#ef4444"
-                    : "#facc15"
-                }
+                color="#38bdf8"
               />
 
             </div>
 
-            {/* AI RECOMMENDATION */}
-
-            {stockData.recommendation && (
-
-              <div
-                style={{
-                  background: "#111827",
-
-                  padding: "20px",
-
-                  borderRadius: "20px",
-
-                  marginBottom: "30px"
-                }}
-              >
-
-                <h1>
-                  AI Recommendation 🧠
-                </h1>
-
-                <h2
-                  style={{
-                    color:
-
-                      stockData.recommendation
-                        .recommendation
-                        .includes("BUY")
-
-                        ? "#22c55e"
-
-                        : stockData.recommendation
-                            .recommendation
-                            .includes("SELL")
-
-                        ? "#ef4444"
-
-                        : "#facc15"
-                  }}
-                >
-
-                  {
-                    stockData.recommendation
-                      .recommendation
-                  }
-
-                </h2>
-
-                <h3>
-                  Confidence:
-                  {" "}
-                  {
-                    stockData.recommendation
-                      .confidence
-                  }
-                  %
-                </h3>
-
-                <div
-                  style={{
-                    marginTop: "20px"
-                  }}
-                >
-
-                  {stockData.recommendation
-                    .reasons
-                    .map((reason, index) => (
-
-                      <p key={index}>
-                        • {reason}
-                      </p>
-                    ))}
-
-                </div>
-
-              </div>
-            )}
-             
-             {/* RISK ANALYSIS */}
-
-{stockData.risk_analysis && (
-
-  <div
-    style={{
-      background: "#111827",
-
-      padding: "20px",
-
-      borderRadius: "20px",
-
-      marginBottom: "30px"
-    }}
-  >
-
-    <h1>
-      Risk Analysis 📊
-    </h1>
-
-    <div
-      style={{
-        display: "grid",
-
-        gridTemplateColumns:
-          "repeat(auto-fit, minmax(220px, 1fr))",
-
-        gap: "20px",
-
-        marginTop: "20px"
-      }}
-    >
-
-      <Card
-        title="Risk Level"
-
-        value={
-          stockData.risk_analysis.risk
-        }
-
-        color={
-          stockData.risk_analysis
-            .risk === "LOW"
-
-            ? "#22c55e"
-
-            : stockData.risk_analysis
-                .risk === "MEDIUM"
-
-            ? "#facc15"
-
-            : "#ef4444"
-        }
-      />
-
-      <Card
-        title="Volatility"
-
-        value={
-          `${stockData.risk_analysis.volatility}%`
-        }
-      />
-
-      <Card
-        title="Sharpe Ratio"
-
-        value={
-          stockData.risk_analysis.sharpe_ratio
-        }
-      />
-
-      <Card
-        title="Daily Return"
-
-        value={
-          `${stockData.risk_analysis.daily_return}%`
-        }
-      />
-
-    </div>
-
-  </div>
-)}
-
-            {/* CHART */}
+            {/* STOCK DETAILS */}
 
             <div
               style={{
                 background: "#111827",
 
-                padding: "20px",
+                padding: "30px",
 
-                borderRadius: "20px",
-
-                marginBottom: "30px"
+                borderRadius: "20px"
               }}
             >
 
-              <h2
+              <h1
                 style={{
                   marginBottom: "20px"
                 }}
               >
                 {stockData.symbol}
+              </h1>
+
+              <h2>
+                Current Price:
                 {" "}
-                Live Candlestick Chart
+                ${stockData.price?.toFixed(2)}
               </h2>
 
-              <StockChart
+              <h3>
+                Day High:
+                {" "}
+                ${stockData.day_high?.toFixed(2)}
+              </h3>
 
-                data={
-                  stockData.chart_data
-                }
+              <h3>
+                Day Low:
+                {" "}
+                ${stockData.day_low?.toFixed(2)}
+              </h3>
 
-                liveCandle={
-                  liveCandle
-                }
-              />
+              <h3>
+                Volume:
+                {" "}
+                {stockData.volume?.toLocaleString()}
+              </h3>
 
             </div>
-
-            {/* PAPER TRADING */}
-
-             <TradePanel
-
-               symbol={selectedStock}
-
-               currentPrice={
-                livePrice ||
-                 stockData.latest_close
-             } 
-             />
-
-            {/* PORTFOLIO */}
-
-            <Portfolio />
-
-            {/* NEWS */}
-
-            <NewsPanel
-              symbol={selectedStock}
-            />
 
           </div>
         )}
