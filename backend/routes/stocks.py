@@ -8,10 +8,6 @@ from backend.services.indicators import (
     add_indicators
 )
 
-from backend.services.risk_analysis import (
-    calculate_risk_metrics
-)
-
 router = APIRouter()
 
 
@@ -21,16 +17,16 @@ def get_stock(symbol: str):
     try:
 
         # DOWNLOAD DATA
-       ticker = yf.Ticker(symbol)
+        ticker = yf.Ticker(symbol)
 
-       df = ticker.history(
+        df = ticker.history(
 
-         period="6mo",
+            period="6mo",
 
-         interval="1d"
-   )
+            interval="1d"
+        )
 
-        # CHECK EMPTY
+        # EMPTY CHECK
         if df.empty:
 
             raise HTTPException(
@@ -39,6 +35,9 @@ def get_stock(symbol: str):
 
                 detail="No stock data found"
             )
+
+        # RESET INDEX
+        df = df.reset_index()
 
         # FIX MULTIINDEX
         if isinstance(
@@ -50,9 +49,6 @@ def get_stock(symbol: str):
                 df.columns
                 .get_level_values(0)
             )
-
-        # RESET INDEX
-        df = df.reset_index()
 
         # VALIDATE CLOSE
         if "Close" not in df.columns:
@@ -67,12 +63,12 @@ def get_stock(symbol: str):
         # ADD INDICATORS
         df = add_indicators(df)
 
-        # DROP NaN
+        # REMOVE NaN
         df = df.dropna()
 
         latest = df.iloc[-1]
 
-        # RSI SIGNAL
+        # SIGNAL
         rsi = latest["rsi"]
 
         if rsi < 30:
@@ -92,7 +88,7 @@ def get_stock(symbol: str):
             float(latest["Close"]) * 1.02
         )
 
-        # MOCK AI RECOMMENDATION
+        # RECOMMENDATION
         recommendation_data = {
 
             "recommendation":
@@ -108,13 +104,6 @@ def get_stock(symbol: str):
                 "Deployment mode active"
             ]
         }
-
-        # RISK ANALYSIS
-        risk_metrics = (
-            calculate_risk_metrics(
-                symbol
-            )
-        )
 
         # CHART DATA
         chart_data = [
@@ -177,9 +166,6 @@ def get_stock(symbol: str):
 
             "recommendation":
                 recommendation_data,
-
-            "risk_analysis":
-                risk_metrics,
 
             "chart_data":
                 chart_data
