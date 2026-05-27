@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+yfinance
+ta
+numpy
+pandas
+transformers
+torch
+bcrypt==4.0.1
+passlib[bcrypt]
+python-jose
