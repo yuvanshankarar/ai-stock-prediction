@@ -1,63 +1,81 @@
-import numpy as np
 import yfinance as yf
+import numpy as np
 
-from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import (
+    load_model
+)
 
-from tensorflow.keras.models import load_model
-
-# LOAD MODEL
-def predict_price(symbol):
-
-    model = load_model(
-        "backend/models/stock_model.h5"
-    )
-
-    ...
+from sklearn.preprocessing import (
+    MinMaxScaler
+)
 
 
 def predict_price(symbol):
 
     try:
 
-        # DOWNLOAD DATA
+        # LOAD MODEL INSIDE FUNCTION
+        model = load_model(
+            "backend/models/stock_model.h5"
+        )
+
+        # DOWNLOAD STOCK DATA
         df = yf.download(
+
             symbol,
-            period="1y",
+
+            period="6mo",
+
             interval="1d",
+
             progress=False
         )
 
-        if df is None or df.empty:
-            return None
+        # CLOSE PRICES
+        close_prices = (
+            df["Close"]
+            .values
+            .reshape(-1, 1)
+        )
 
-        # CLOSE PRICE
-        data = df["Close"].values.reshape(-1, 1)
-
-        # SCALE
+        # SCALE DATA
         scaler = MinMaxScaler()
 
-        scaled = scaler.fit_transform(data)
+        scaled_data = scaler.fit_transform(
+            close_prices
+        )
 
         # LAST 60 DAYS
-        last_60 = scaled[-60:]
+        last_60 = scaled_data[-60:]
 
         X_test = np.array([last_60])
 
-        X_test = X_test.reshape(
-            1,
-            60,
-            1
+        X_test = np.reshape(
+
+            X_test,
+
+            (
+                X_test.shape[0],
+
+                X_test.shape[1],
+
+                1
+            )
         )
 
         # PREDICT
-        prediction = model.predict(
+        predicted_price = model.predict(
+
             X_test,
+
             verbose=0
         )
 
         # INVERSE SCALE
-        predicted_price = scaler.inverse_transform(
-            prediction
+        predicted_price = (
+            scaler.inverse_transform(
+                predicted_price
+            )
         )
 
         return float(
@@ -71,4 +89,4 @@ def predict_price(symbol):
             e
         )
 
-        return None
+        return 0
