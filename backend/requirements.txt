@@ -11,3 +11,6 @@ passlib[bcrypt]
 bcrypt==4.0.1
 python-multipart
 websockets
+requests_cache
+requests_ratelimiter
+pyrate_limiter

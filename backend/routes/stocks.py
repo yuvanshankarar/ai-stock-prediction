@@ -4,6 +4,18 @@ from fastapi import HTTPException
 import yfinance as yf
 import pandas as pd
 
+import requests_cache
+
+from requests_ratelimiter import (
+    LimiterSession
+)
+
+from pyrate_limiter import (
+    Duration,
+    RequestRate,
+    Limiter
+)
+
 from backend.services.indicators import (
     add_indicators
 )
@@ -11,14 +23,40 @@ from backend.services.indicators import (
 router = APIRouter()
 
 
+# CACHE + RATE LIMIT SESSION
+session = LimiterSession(
+
+    limiter=Limiter(
+
+        RequestRate(
+
+            2,
+
+            Duration.SECOND * 5
+        )
+    )
+)
+
+# FAKE BROWSER HEADERS
+session.headers[
+    "User-agent"
+] = "Mozilla/5.0"
+
+
 @router.get("/stock/{symbol}")
 def get_stock(symbol: str):
 
     try:
 
-        # DOWNLOAD DATA
-        ticker = yf.Ticker(symbol)
+        # YFINANCE TICKER
+        ticker = yf.Ticker(
 
+            symbol,
+
+            session=session
+        )
+
+        # FETCH DATA
         df = ticker.history(
 
             period="6mo",
@@ -63,12 +101,12 @@ def get_stock(symbol: str):
         # ADD INDICATORS
         df = add_indicators(df)
 
-        # REMOVE NaN
+        # DROP NaN
         df = df.dropna()
 
         latest = df.iloc[-1]
 
-        # SIGNAL
+        # SIGNAL LOGIC
         rsi = latest["rsi"]
 
         if rsi < 30:
@@ -88,7 +126,7 @@ def get_stock(symbol: str):
             float(latest["Close"]) * 1.02
         )
 
-        # RECOMMENDATION
+        # MOCK AI RECOMMENDATION
         recommendation_data = {
 
             "recommendation":
