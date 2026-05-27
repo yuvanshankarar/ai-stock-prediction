@@ -13,7 +13,30 @@ def get_stock(symbol: str):
 
         ticker = yf.Ticker(symbol)
 
+        # CURRENT INFO
         info = ticker.fast_info
+
+        # HISTORICAL DATA
+        history = ticker.history(
+
+            period="1mo",
+
+            interval="1d"
+        )
+
+        # CHART DATA
+        chart_data = []
+
+        for index, row in history.iterrows():
+
+            chart_data.append({
+
+                "date":
+                    str(index.date()),
+
+                "close":
+                    float(row["Close"])
+            })
 
         return {
 
@@ -30,7 +53,10 @@ def get_stock(symbol: str):
                 info.get("dayLow"),
 
             "volume":
-                info.get("lastVolume")
+                info.get("lastVolume"),
+
+            "chart_data":
+                chart_data
         }
 
     except Exception as e:
