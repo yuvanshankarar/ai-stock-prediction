@@ -3,10 +3,6 @@ from fastapi.middleware.cors import (
     CORSMiddleware
 )
 
-from backend.routes.stocks import (
-    router as stock_router
-)
-
 app = FastAPI()
 
 app.add_middleware(
@@ -40,7 +36,3 @@ def health():
         "status":
             "healthy"
     }
-
-
-# STOCK ROUTES
-app.include_router(stock_router)
