@@ -4,10 +4,13 @@ import pandas as pd
 from backend.services.risk_analysis import (
     calculate_risk_metrics
 )
+#from backend.services.news_sentiment import (
+ #   analyze_sentiment
+#)
 
 from backend.services.data_fetch import fetch_stock_data
 from backend.services.indicators import add_indicators
-from backend.services.predict import predict_price
+#from backend.services.predict import predict_price
 from backend.services.recommendation import (
     generate_recommendation
 )
@@ -45,7 +48,7 @@ def get_stock(symbol: str):
         else:
             signal = "HOLD"
 
-        prediction = predict_price(symbol)
+       prediction = float(latest["Close"]) * 1.02
 
         # MOCK SENTIMENT SCORE
 
@@ -53,14 +56,21 @@ def get_stock(symbol: str):
 
         risk_metrics = calculate_risk_metrics(symbol)
 
-        recommendation_data = generate_recommendation(
-            rsi=latest["rsi"],
-            macd=latest["macd"],
-            macd_signal=latest["macd_signal"],
-            predicted_price=prediction,
-            current_price=latest["Close"],
-            sentiment_score=sentiment_score
-        )
+       recommendation_data = {
+
+    "recommendation":
+        "HOLD",
+
+    "confidence":
+        75,
+
+    "reasons": [
+
+        "Deployment mode enabled",
+
+        "AI models temporarily disabled"
+    ]
+}
 
         date_col = (
             "Date"

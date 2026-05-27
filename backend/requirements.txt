@@ -4,13 +4,10 @@ yfinance
 pandas
 numpy
 scikit-learn
-tensorflow
 ta
 sqlalchemy
 python-jose
 passlib[bcrypt]
 bcrypt==4.0.1
 python-multipart
-transformers
-torch
 websockets
