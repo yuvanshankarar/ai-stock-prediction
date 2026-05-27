@@ -21,19 +21,17 @@ def get_stock(symbol: str):
     try:
 
         # DOWNLOAD DATA
-        df = yf.download(
+       ticker = yf.Ticker(symbol)
 
-            symbol,
+       df = ticker.history(
 
-            period="6mo",
+         period="6mo",
 
-            interval="1d",
-
-            progress=False
-        )
+         interval="1d"
+   )
 
         # CHECK EMPTY
-        if df is None or df.empty:
+        if df.empty:
 
             raise HTTPException(
 
