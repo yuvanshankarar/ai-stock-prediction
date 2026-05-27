@@ -25,7 +25,7 @@ Base.metadata.create_all(bind=engine)
 
 # Import routes
 from backend.routes.stocks import router as stock_router
-from backend.routes.ws import router as ws_router
+#from backend.routes.ws import router as ws_router
 
 # Create app
 app = FastAPI(
@@ -63,10 +63,7 @@ app.include_router(
 )
 
 # Register WebSocket routes
-app.include_router(
-    ws_router,
-    tags=["WebSockets"]
-)
+#app.include_router( ws_router,tags=["WebSockets"])
 
 # register portfolio routes
 app.include_router(portfolio_router)
