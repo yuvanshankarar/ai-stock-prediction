@@ -5,8 +5,7 @@ import React, {
 
 import axios from "axios";
 
-import WatchlistSidebar
-from "./components/WatchlistSidebar";
+import WatchlistSidebar from "./components/WatchlistSidebar";
 
 export default function App() {
 
@@ -25,10 +24,6 @@ export default function App() {
   // QUANTITY
   const [quantity, setQuantity] =
     useState(1);
-
-  // USERNAME
-  const username =
-    localStorage.getItem("username");
 
   // API URL
   const API =
@@ -65,29 +60,19 @@ export default function App() {
 
     try {
 
+      const username =
+        localStorage.getItem("username");
+
       await axios.post(
-
         `${API}/buy`,
-
-        null,
-
         {
-          params: {
-
-            username,
-
-            symbol: selectedStock,
-
-            quantity,
-
-            price: stockData.price
-          }
+          username,
+          symbol: selectedStock,
+          quantity
         }
       );
 
-      alert(
-        "Stock Purchased 🚀"
-      );
+      alert("Stock Purchased 🚀");
 
     } catch (error) {
 
@@ -102,29 +87,19 @@ export default function App() {
 
     try {
 
+      const username =
+        localStorage.getItem("username");
+
       await axios.post(
-
         `${API}/sell`,
-
-        null,
-
         {
-          params: {
-
-            username,
-
-            symbol: selectedStock,
-
-            quantity,
-
-            price: stockData.price
-          }
+          username,
+          symbol: selectedStock,
+          quantity
         }
       );
 
-      alert(
-        "Stock Sold 🚀"
-      );
+      alert("Stock Sold 🚀");
 
     } catch (error) {
 
@@ -132,6 +107,17 @@ export default function App() {
 
       alert("Sell failed");
     }
+  }
+
+  // LOGOUT
+  function logout() {
+
+    localStorage.removeItem(
+      "username"
+    );
+
+    window.location.href =
+      "/login";
   }
 
   // LOAD STOCK
@@ -178,27 +164,54 @@ export default function App() {
         }}
       >
 
-        {/* TITLE */}
+        {/* HEADER */}
 
-        <h1
+        <div
           style={{
-            textAlign: "center",
+            display: "flex",
+
+            justifyContent:
+              "space-between",
+
+            alignItems: "center",
 
             marginBottom: "30px"
           }}
         >
-          AI Trading Dashboard 🚀
-        </h1>
+
+          <button
+
+            onClick={logout}
+
+            style={{
+              background: "#ef4444",
+
+              border: "none",
+
+              padding: "12px 20px",
+
+              borderRadius: "10px",
+
+              color: "white",
+
+              cursor: "pointer"
+            }}
+          >
+            Logout
+          </button>
+
+          <h1>
+            AI Trading Dashboard 🚀
+          </h1>
+
+          <div />
+        </div>
 
         {/* LOADING */}
 
         {loading && (
 
-          <h2
-            style={{
-              textAlign: "center"
-            }}
-          >
+          <h2>
             Loading...
           </h2>
         )}
@@ -209,7 +222,7 @@ export default function App() {
 
           <div>
 
-            {/* CARDS */}
+            {/* INFO CARDS */}
 
             <div
               style={{
@@ -220,7 +233,7 @@ export default function App() {
 
                 gap: "20px",
 
-                marginBottom: "30px"
+                marginBottom: "40px"
               }}
             >
 
@@ -228,8 +241,6 @@ export default function App() {
                 title="Current Price"
 
                 value={`$${stockData.price?.toFixed(2)}`}
-
-                color="#22c55e"
               />
 
               <Card
@@ -250,13 +261,11 @@ export default function App() {
                 value={
                   stockData.volume?.toLocaleString()
                 }
-
-                color="#38bdf8"
               />
 
             </div>
 
-            {/* DETAILS */}
+            {/* STOCK DETAILS */}
 
             <div
               style={{
@@ -268,11 +277,7 @@ export default function App() {
               }}
             >
 
-              <h1
-                style={{
-                  marginBottom: "20px"
-                }}
-              >
+              <h1>
                 {stockData.symbol}
               </h1>
 
@@ -315,7 +320,9 @@ export default function App() {
                   value={quantity}
 
                   onChange={(e) =>
-                    setQuantity(e.target.value)
+                    setQuantity(
+                      e.target.value
+                    )
                   }
 
                   style={{
@@ -385,15 +392,9 @@ export default function App() {
 }
 
 // CARD COMPONENT
-
 function Card({
-
   title,
-
-  value,
-
-  color
-
+  value
 }) {
 
   return (
@@ -418,11 +419,7 @@ function Card({
         {title}
       </h3>
 
-      <h1
-        style={{
-          color: color || "white"
-        }}
-      >
+      <h1>
         {value}
       </h1>
 
