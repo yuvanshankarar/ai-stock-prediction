@@ -4,7 +4,6 @@ import React, {
 
 import axios from "axios";
 
-
 export default function Login() {
 
   const [username, setUsername] =
@@ -16,7 +15,6 @@ export default function Login() {
   const API =
     import.meta.env.VITE_API_URL;
 
-
   async function handleLogin(e) {
 
     e.preventDefault();
@@ -25,38 +23,33 @@ export default function Login() {
 
       const response =
         await axios.post(
-
           `${API}/login`,
-
           {
             username,
             password
           }
         );
 
-      localStorage.setItem(
-         "username",
+      if (
+        response.data.message ===
+        "Login successful"
+      ) {
+
+        localStorage.setItem(
+          "username",
           username
         );
 
-        localStorage.setItem(
-
-          "token",
-
-          response.data.token
-        );
-
         alert(
-          "Login successful"
+          "Login successful 🚀"
         );
 
-        window.location.href =
-          "/";
+        window.location.href = "/";
 
       } else {
 
         alert(
-          response.data.message
+          "Invalid credentials"
         );
       }
 
@@ -70,15 +63,18 @@ export default function Login() {
     }
   }
 
-
   return (
 
     <div
       style={{
         background: "#020617",
-        minHeight: "100vh",
+
+        height: "100vh",
+
         display: "flex",
+
         justifyContent: "center",
+
         alignItems: "center"
       }}
     >
@@ -89,16 +85,20 @@ export default function Login() {
 
         style={{
           background: "#0f172a",
+
           padding: "40px",
+
           borderRadius: "20px",
-          width: "350px"
+
+          width: "400px"
         }}
       >
 
         <h1
           style={{
             color: "white",
-            marginBottom: "20px"
+
+            marginBottom: "30px"
           }}
         >
           Login 🚀
@@ -118,14 +118,14 @@ export default function Login() {
             )
           }
 
-          required
-
           style={{
             width: "100%",
+
             padding: "15px",
+
             marginBottom: "20px",
-            borderRadius: "10px",
-            border: "none"
+
+            borderRadius: "10px"
           }}
         />
 
@@ -143,14 +143,14 @@ export default function Login() {
             )
           }
 
-          required
-
           style={{
             width: "100%",
+
             padding: "15px",
+
             marginBottom: "20px",
-            borderRadius: "10px",
-            border: "none"
+
+            borderRadius: "10px"
           }}
         />
 
@@ -160,17 +160,21 @@ export default function Login() {
 
           style={{
             width: "100%",
+
             padding: "15px",
-            borderRadius: "10px",
-            border: "none",
+
             background: "#2563eb",
+
             color: "white",
+
+            border: "none",
+
+            borderRadius: "10px",
+
             cursor: "pointer"
           }}
         >
-
           Login
-
         </button>
 
       </form>
