@@ -1,12 +1,10 @@
+```jsx
 import React, {
   useEffect,
   useState
 } from "react";
 
 import axios from "axios";
-
-import WatchlistSidebar
-from "./components/WatchlistSidebar";
 
 export default function App() {
 
@@ -33,6 +31,9 @@ export default function App() {
   const [transactions, setTransactions] =
     useState([]);
 
+  const [watchlist, setWatchlist] =
+    useState([]);
+
   // FETCH STOCK
   const fetchStock = async (symbol) => {
 
@@ -51,10 +52,7 @@ export default function App() {
 
     } catch (error) {
 
-      console.error(
-        "Stock fetch error:",
-        error
-      );
+      console.error(error);
 
     } finally {
 
@@ -73,23 +71,22 @@ export default function App() {
         );
 
       const response =
-        await fetch(
+        await axios.get(
           `${API_URL}/portfolio/${username}`
         );
 
-      const data =
-        await response.json();
-
       setPortfolio(
-        data || []
+
+        Array.isArray(
+          response.data
+        )
+          ? response.data
+          : []
       );
 
     } catch (error) {
 
-      console.error(
-        "Portfolio fetch error:",
-        error
-      );
+      console.error(error);
 
       setPortfolio([]);
     }
@@ -106,23 +103,22 @@ export default function App() {
         );
 
       const response =
-        await fetch(
+        await axios.get(
           `${API_URL}/transactions/${username}`
         );
 
-      const data =
-        await response.json();
-
       setTransactions(
-        data || []
+
+        Array.isArray(
+          response.data
+        )
+          ? response.data
+          : []
       );
 
     } catch (error) {
 
-      console.error(
-        "Transaction fetch error:",
-        error
-      );
+      console.error(error);
 
       setTransactions([]);
     }
@@ -139,36 +135,25 @@ export default function App() {
         );
 
       const response =
-        await fetch(
+        await axios.post(
           `${API_URL}/buy`,
           {
 
-            method: "POST",
+            username,
 
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
+            symbol:
+              selectedStock,
 
-            body: JSON.stringify({
+            quantity,
 
-              username,
-
-              symbol:
-                selectedStock,
-
-              quantity,
-
-              price:
-                stockData.price
-            })
+            price:
+              stockData.price
           }
         );
 
-      const data =
-        await response.json();
-
-      alert(data.message);
+      alert(
+        response.data.message
+      );
 
       fetchPortfolio();
 
@@ -193,36 +178,25 @@ export default function App() {
         );
 
       const response =
-        await fetch(
+        await axios.post(
           `${API_URL}/sell`,
           {
 
-            method: "POST",
+            username,
 
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
+            symbol:
+              selectedStock,
 
-            body: JSON.stringify({
+            quantity,
 
-              username,
-
-              symbol:
-                selectedStock,
-
-              quantity,
-
-              price:
-                stockData.price
-            })
+            price:
+              stockData.price
           }
         );
 
-      const data =
-        await response.json();
-
-      alert(data.message);
+      alert(
+        response.data.message
+      );
 
       fetchPortfolio();
 
@@ -236,21 +210,12 @@ export default function App() {
     }
   };
 
-  // LOGOUT
-  const logout = () => {
-
-    localStorage.removeItem(
-      "username"
-    );
-
-    window.location.href =
-      "/login";
-  };
-
-  // INITIAL LOAD
+  // LOAD DATA
   useEffect(() => {
 
-    fetchStock(selectedStock);
+    fetchStock(
+      selectedStock
+    );
 
     fetchPortfolio();
 
@@ -262,378 +227,230 @@ export default function App() {
 
     <div
       style={{
-        display: "flex",
-
-        background: "#0f172a",
+        background: "#020617",
 
         minHeight: "100vh",
+
+        padding: "20px",
 
         color: "white"
       }}
     >
 
-      {/* SIDEBAR */}
+      <h1>
+        AI Trading Dashboard 🚀
+      </h1>
 
-      <WatchlistSidebar
-
-        selectedStock={
-          selectedStock
-        }
-
-        setSelectedStock={
-          setSelectedStock
-        }
-      />
-
-      {/* MAIN */}
+      {/* STOCK SELECT */}
 
       <div
         style={{
-          flex: 1,
-
-          padding: "20px"
+          marginBottom: "20px"
         }}
       >
 
-        {/* HEADER */}
+        <button
+          onClick={() =>
+            setSelectedStock("AAPL")
+          }
+        >
+          AAPL
+        </button>
 
-        <div
+        <button
+          onClick={() =>
+            setSelectedStock("TSLA")
+          }
           style={{
-            display: "flex",
-
-            justifyContent:
-              "space-between",
-
-            alignItems: "center",
-
-            marginBottom: "30px"
+            marginLeft: "10px"
           }}
         >
-
-          <button
-
-            onClick={logout}
-
-            style={{
-              background: "#ef4444",
-
-              border: "none",
-
-              padding: "12px 20px",
-
-              borderRadius: "10px",
-
-              color: "white",
-
-              cursor: "pointer"
-            }}
-          >
-            Logout
-          </button>
-
-          <h1>
-            AI Trading Dashboard 🚀
-          </h1>
-
-          <div />
-        </div>
-
-        {/* LOADING */}
-
-        {loading && (
-
-          <h2>
-            Loading...
-          </h2>
-        )}
-
-        {/* STOCK DATA */}
-
-        {!loading && stockData && (
-
-          <div>
-
-            {/* INFO CARDS */}
-
-            <div
-              style={{
-                display: "grid",
-
-                gridTemplateColumns:
-                  "repeat(auto-fit, minmax(220px, 1fr))",
-
-                gap: "20px",
-
-                marginBottom: "40px"
-              }}
-            >
-
-              <Card
-                title="Current Price"
-                value={`$${stockData.price?.toFixed(2)}`}
-              />
-
-              <Card
-                title="Day High"
-                value={`$${stockData.day_high?.toFixed(2)}`}
-              />
-
-              <Card
-                title="Day Low"
-                value={`$${stockData.day_low?.toFixed(2)}`}
-              />
-
-              <Card
-                title="Volume"
-                value={
-                  stockData.volume?.toLocaleString()
-                }
-              />
-
-            </div>
-
-            {/* STOCK DETAILS */}
-
-            <div
-              style={{
-                background: "#111827",
-
-                padding: "30px",
-
-                borderRadius: "20px"
-              }}
-            >
-
-              <h1>
-                {stockData.symbol}
-              </h1>
-
-              <h2>
-                Current Price:
-                {" "}
-                ${stockData.price?.toFixed(2)}
-              </h2>
-
-              <h3>
-                Day High:
-                {" "}
-                ${stockData.day_high?.toFixed(2)}
-              </h3>
-
-              <h3>
-                Day Low:
-                {" "}
-                ${stockData.day_low?.toFixed(2)}
-              </h3>
-
-              <h3>
-                Volume:
-                {" "}
-                {stockData.volume?.toLocaleString()}
-              </h3>
-
-              {/* BUY SELL */}
-
-              <div
-                style={{
-                  marginTop: "30px"
-                }}
-              >
-
-                <input
-
-                  type="number"
-
-                  value={quantity}
-
-                  onChange={(e) =>
-                    setQuantity(
-                      e.target.value
-                    )
-                  }
-
-                  style={{
-                    padding: "10px",
-
-                    borderRadius: "10px",
-
-                    marginRight: "10px"
-                  }}
-                />
-
-                <button
-
-                  onClick={buyStock}
-
-                  style={{
-                    padding: "12px 20px",
-
-                    background: "#22c55e",
-
-                    border: "none",
-
-                    borderRadius: "10px",
-
-                    color: "white",
-
-                    marginRight: "10px",
-
-                    cursor: "pointer"
-                  }}
-                >
-                  Buy
-                </button>
-
-                <button
-
-                  onClick={sellStock}
-
-                  style={{
-                    padding: "12px 20px",
-
-                    background: "#ef4444",
-
-                    border: "none",
-
-                    borderRadius: "10px",
-
-                    color: "white",
-
-                    cursor: "pointer"
-                  }}
-                >
-                  Sell
-                </button>
-
-              </div>
-
-              {/* HOLDINGS */}
-
-              <div
-                style={{
-                  marginTop: "40px"
-                }}
-              >
-
-                <h2>
-                  Your Holdings
-                </h2>
-
-                {portfolio?.map(
-                  (item, index) => (
-
-                    <div key={index}>
-
-                      <h3>
-                        {item.symbol}
-                      </h3>
-
-                      <p>
-                        Quantity:
-                        {" "}
-                        {item.quantity}
-                      </p>
-
-                      <p>
-                        Avg Price:
-                        {" "}
-                        ${item.average_price}
-                      </p>
-
-                    </div>
-                  )
-                )}
-
-              </div>
-
-              {/* TRANSACTIONS */}
-
-              <div
-                style={{
-                  marginTop: "40px"
-                }}
-              >
-
-                <h2>
-                  Transaction History
-                </h2>
-
-                {transactions?.map(
-                  (item, index) => (
-
-                    <div key={index}>
-
-                      <p>
-                        {item.type}
-                        {" "}
-                        —
-                        {" "}
-                        {item.symbol}
-                      </p>
-
-                      <p>
-                        Qty:
-                        {" "}
-                        {item.quantity}
-                      </p>
-
-                      <p>
-                        Price:
-                        {" "}
-                        ${item.price}
-                      </p>
-
-                      <hr />
-
-                    </div>
-                  )
-                )}
-
-              </div>
-
-            </div>
-
-          </div>
-        )}
+          TSLA
+        </button>
+
+        <button
+          onClick={() =>
+            setSelectedStock("MSFT")
+          }
+          style={{
+            marginLeft: "10px"
+          }}
+        >
+          MSFT
+        </button>
 
       </div>
 
+      {/* LOADING */}
+
+      {loading && (
+
+        <h2>
+          Loading...
+        </h2>
+      )}
+
+      {/* STOCK DATA */}
+
+      {!loading && stockData && (
+
+        <div
+          style={{
+            background: "#111827",
+
+            padding: "30px",
+
+            borderRadius: "20px"
+          }}
+        >
+
+          <h1>
+            {stockData.symbol}
+          </h1>
+
+          <h2>
+            Price:
+            {" "}
+            ${stockData.price?.toFixed(2)}
+          </h2>
+
+          <h3>
+            Day High:
+            {" "}
+            ${stockData.day_high?.toFixed(2)}
+          </h3>
+
+          <h3>
+            Day Low:
+            {" "}
+            ${stockData.day_low?.toFixed(2)}
+          </h3>
+
+          <h3>
+            Volume:
+            {" "}
+            {stockData.volume?.toLocaleString()}
+          </h3>
+
+          {/* BUY SELL */}
+
+          <div
+            style={{
+              marginTop: "30px"
+            }}
+          >
+
+            <input
+
+              type="number"
+
+              value={quantity}
+
+              onChange={(e) =>
+                setQuantity(
+                  e.target.value
+                )
+              }
+
+              style={{
+                padding: "10px",
+
+                marginRight: "10px"
+              }}
+            />
+
+            <button
+              onClick={buyStock}
+            >
+              Buy
+            </button>
+
+            <button
+              onClick={sellStock}
+
+              style={{
+                marginLeft: "10px"
+              }}
+            >
+              Sell
+            </button>
+
+          </div>
+
+          {/* PORTFOLIO */}
+
+          <div
+            style={{
+              marginTop: "40px"
+            }}
+          >
+
+            <h2>
+              Holdings
+            </h2>
+
+            {portfolio?.map(
+              (item, index) => (
+
+                <div key={index}>
+
+                  <p>
+                    {item.symbol}
+                    {" "}
+                    —
+                    {" "}
+                    Qty:
+                    {" "}
+                    {item.quantity}
+                  </p>
+
+                </div>
+              )
+            )}
+
+          </div>
+
+          {/* TRANSACTIONS */}
+
+          <div
+            style={{
+              marginTop: "40px"
+            }}
+          >
+
+            <h2>
+              Transactions
+            </h2>
+
+            {transactions?.map(
+              (item, index) => (
+
+                <div key={index}>
+
+                  <p>
+                    {item.type}
+                    {" "}
+                    —
+                    {" "}
+                    {item.symbol}
+                    {" "}
+                    —
+                    {" "}
+                    Qty:
+                    {" "}
+                    {item.quantity}
+                  </p>
+
+                </div>
+              )
+            )}
+
+          </div>
+
+        </div>
+      )}
+
     </div>
   );
 }
-
-// CARD COMPONENT
-function Card({
-  title,
-  value
-}) {
-
-  return (
-
-    <div
-      style={{
-        background: "#1e293b",
-
-        padding: "20px",
-
-        borderRadius: "20px",
-
-        textAlign: "center"
-      }}
-    >
-
-      <h3
-        style={{
-          color: "#94a3b8"
-        }}
-      >
-        {title}
-      </h3>
-
-      <h1>
-        {value}
-      </h1>
-
-    </div>
-  );
-}
+```
