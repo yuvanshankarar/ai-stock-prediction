@@ -4,17 +4,8 @@ import React, {
 
 import axios from "axios";
 
-import {
-  useNavigate
-} from "react-router-dom";
 
 export default function Login() {
-
-  const navigate =
-    useNavigate();
-
-  const API =
-    import.meta.env.VITE_API_URL;
 
   const [username, setUsername] =
     useState("");
@@ -22,7 +13,13 @@ export default function Login() {
   const [password, setPassword] =
     useState("");
 
-  async function handleLogin() {
+  const API =
+    import.meta.env.VITE_API_URL;
+
+
+  async function handleLogin(e) {
+
+    e.preventDefault();
 
     try {
 
@@ -31,33 +28,40 @@ export default function Login() {
 
           `${API}/login`,
 
-          null,
-
           {
-
-            params: {
-
-              username,
-
-              password
-            }
+            username,
+            password
           }
         );
 
-      localStorage.setItem(
+      if (
+        response.data.token
+      ) {
 
-        "token",
+        localStorage.setItem(
 
-        response.data.access_token
-      );
+          "token",
 
-      alert(
-        "Login successful"
-      );
+          response.data.token
+        );
 
-      navigate("/");
+        alert(
+          "Login successful"
+        );
+
+        window.location.href =
+          "/";
+
+      } else {
+
+        alert(
+          response.data.message
+        );
+      }
 
     } catch (error) {
+
+      console.error(error);
 
       alert(
         "Login failed"
@@ -65,30 +69,27 @@ export default function Login() {
     }
   }
 
+
   return (
 
     <div
       style={{
-        background: "#0f172a",
-
+        background: "#020617",
         minHeight: "100vh",
-
         display: "flex",
-
         justifyContent: "center",
-
         alignItems: "center"
       }}
     >
 
-      <div
+      <form
+
+        onSubmit={handleLogin}
+
         style={{
-          background: "#111827",
-
+          background: "#0f172a",
           padding: "40px",
-
           borderRadius: "20px",
-
           width: "350px"
         }}
       >
@@ -96,14 +97,15 @@ export default function Login() {
         <h1
           style={{
             color: "white",
-
             marginBottom: "20px"
           }}
         >
-          Login 🔐
+          Login 🚀
         </h1>
 
         <input
+
+          type="text"
 
           placeholder="Username"
 
@@ -115,7 +117,15 @@ export default function Login() {
             )
           }
 
-          style={inputStyle}
+          required
+
+          style={{
+            width: "100%",
+            padding: "15px",
+            marginBottom: "20px",
+            borderRadius: "10px",
+            border: "none"
+          }}
         />
 
         <input
@@ -132,52 +142,38 @@ export default function Login() {
             )
           }
 
-          style={inputStyle}
+          required
+
+          style={{
+            width: "100%",
+            padding: "15px",
+            marginBottom: "20px",
+            borderRadius: "10px",
+            border: "none"
+          }}
         />
 
         <button
 
-          onClick={handleLogin}
+          type="submit"
 
-          style={buttonStyle}
+          style={{
+            width: "100%",
+            padding: "15px",
+            borderRadius: "10px",
+            border: "none",
+            background: "#2563eb",
+            color: "white",
+            cursor: "pointer"
+          }}
         >
 
           Login
 
         </button>
 
-      </div>
+      </form>
 
     </div>
   );
 }
-
-const inputStyle = {
-
-  width: "100%",
-
-  padding: "12px",
-
-  marginBottom: "15px",
-
-  borderRadius: "10px",
-
-  border: "none"
-};
-
-const buttonStyle = {
-
-  width: "100%",
-
-  padding: "12px",
-
-  background: "#22c55e",
-
-  color: "white",
-
-  border: "none",
-
-  borderRadius: "10px",
-
-  cursor: "pointer"
-};
