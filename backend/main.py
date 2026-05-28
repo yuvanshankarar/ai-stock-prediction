@@ -4,9 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.routes.stocks import router as stocks_router
 from backend.routes.auth import router as auth_router
 
+from backend.database import engine
+from backend.models import Base
+
 
 app = FastAPI()
 
+Base.metadata.create_all(bind=engine)
 
 # CORS
 app.add_middleware(
