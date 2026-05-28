@@ -80,7 +80,9 @@ export default function App() {
       const data =
         await response.json();
 
-      setPortfolio(data);
+      setPortfolio(
+        data || []
+      );
 
     } catch (error) {
 
@@ -88,6 +90,8 @@ export default function App() {
         "Portfolio fetch error:",
         error
       );
+
+      setPortfolio([]);
     }
   };
 
@@ -109,7 +113,9 @@ export default function App() {
       const data =
         await response.json();
 
-      setTransactions(data);
+      setTransactions(
+        data || []
+      );
 
     } catch (error) {
 
@@ -117,6 +123,8 @@ export default function App() {
         "Transaction fetch error:",
         error
       );
+
+      setTransactions([]);
     }
   };
 
@@ -511,7 +519,7 @@ export default function App() {
                   Your Holdings
                 </h2>
 
-                {portfolio.map(
+                {portfolio?.map(
                   (item, index) => (
 
                     <div key={index}>
@@ -550,7 +558,7 @@ export default function App() {
                   Transaction History
                 </h2>
 
-                {transactions.map(
+                {transactions?.map(
                   (item, index) => (
 
                     <div key={index}>
