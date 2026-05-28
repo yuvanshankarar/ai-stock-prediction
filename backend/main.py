@@ -6,6 +6,7 @@ from backend.routes.auth import router as auth_router
 
 from backend.database import engine
 from backend.models import Base
+from backend.routes.trading import router as trading_router
 
 
 app = FastAPI()
@@ -49,3 +50,5 @@ def health():
 app.include_router(stocks_router)
 
 app.include_router(auth_router)
+
+app.include_router(trading_router)
