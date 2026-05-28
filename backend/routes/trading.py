@@ -1,9 +1,12 @@
+
 from fastapi import APIRouter
-from backend.database import SessionLocal
-from backend.models import Holding, Transaction
 
 router = APIRouter()
 
+# TEMP MEMORY STORAGE
+portfolio_data = {}
+
+transaction_data = {}
 
 # BUY STOCK
 @router.post("/buy")
@@ -17,66 +20,43 @@ def buy_stock(data: dict):
 
     price = float(data["price"])
 
-    db = SessionLocal()
+    # CREATE USER PORTFOLIO
+    if username not in portfolio_data:
 
-    holding = db.query(Holding).filter(
-        Holding.username == username,
-        Holding.symbol == symbol
-    ).first()
+        portfolio_data[username] = []
 
-    # EXISTING HOLDING
-    if holding:
+    # ADD HOLDING
+    portfolio_data[username].append({
 
-        total_quantity = holding.quantity + quantity
+        "symbol": symbol,
 
-        total_cost = (
-            holding.average_price * holding.quantity
-        ) + (price * quantity)
+        "quantity": quantity,
 
-        holding.quantity = total_quantity
+        "average_price": price
+    })
 
-        holding.average_price = (
-            total_cost / total_quantity
-        )
+    # CREATE TRANSACTION LIST
+    if username not in transaction_data:
 
-    # NEW HOLDING
-    else:
-
-        holding = Holding(
-
-            username=username,
-
-            symbol=symbol,
-
-            quantity=quantity,
-
-            average_price=price
-        )
-
-        db.add(holding)
+        transaction_data[username] = []
 
     # SAVE TRANSACTION
-    transaction = Transaction(
+    transaction_data[username].append({
 
-        username=username,
+        "type": "BUY",
 
-        symbol=symbol,
+        "symbol": symbol,
 
-        quantity=quantity,
+        "quantity": quantity,
 
-        price=price,
-
-        type="BUY"
-    )
-
-    db.add(transaction)
-
-    db.commit()
+        "price": price
+    })
 
     return {
-        "message": f"Bought {quantity} shares of {symbol}"
-    }
 
+        "message":
+        f"Bought {quantity} shares of {symbol}"
+    }
 
 # SELL STOCK
 @router.post("/sell")
@@ -90,51 +70,42 @@ def sell_stock(data: dict):
 
     price = float(data["price"])
 
-    db = SessionLocal()
-
-    holding = db.query(Holding).filter(
-        Holding.username == username,
-        Holding.symbol == symbol
-    ).first()
-
-    # VALIDATION
-    if not holding:
-
-        return {
-            "message": "No holdings found"
-        }
-
-    if holding.quantity < quantity:
-
-        return {
-            "message": "Not enough shares"
-        }
-
-    holding.quantity -= quantity
-
-    # DELETE EMPTY HOLDING
-    if holding.quantity == 0:
-
-        db.delete(holding)
-
     # SAVE TRANSACTION
-    transaction = Transaction(
+    if username not in transaction_data:
 
-        username=username,
+        transaction_data[username] = []
 
-        symbol=symbol,
+    transaction_data[username].append({
 
-        quantity=quantity,
+        "type": "SELL",
 
-        price=price,
+        "symbol": symbol,
 
-        type="SELL"
-    )
+        "quantity": quantity,
 
-    db.add(transaction)
-
-    db.commit()
+        "price": price
+    })
 
     return {
-        "message": f"Sold {quantity} shares of {symbol}"
+
+        "message":
+        f"Sold {quantity} shares of {symbol}"
     }
+
+# GET PORTFOLIO
+@router.get("/portfolio/{username}")
+def get_portfolio(username: str):
+
+    return portfolio_data.get(
+        username,
+        []
+    )
+
+# GET TRANSACTIONS
+@router.get("/transactions/{username}")
+def get_transactions(username: str):
+
+    return transaction_data.get(
+        username,
+        []
+     )
