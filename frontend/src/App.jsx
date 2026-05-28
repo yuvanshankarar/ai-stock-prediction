@@ -1,4 +1,4 @@
-```jsx
+
 import React, {
   useEffect,
   useState
@@ -31,9 +31,6 @@ export default function App() {
   const [transactions, setTransactions] =
     useState([]);
 
-  const [watchlist, setWatchlist] =
-    useState([]);
-
   // FETCH STOCK
   const fetchStock = async (symbol) => {
 
@@ -41,10 +38,9 @@ export default function App() {
 
       setLoading(true);
 
-      const response =
-        await axios.get(
-          `${API_URL}/stock/${symbol}`
-        );
+      const response = await axios.get(
+        `${API_URL}/stock/${symbol}`
+      );
 
       setStockData(
         response.data
@@ -52,7 +48,10 @@ export default function App() {
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Stock fetch error:",
+        error
+      );
 
     } finally {
 
@@ -228,11 +227,8 @@ export default function App() {
     <div
       style={{
         background: "#020617",
-
         minHeight: "100vh",
-
         padding: "20px",
-
         color: "white"
       }}
     >
@@ -241,7 +237,7 @@ export default function App() {
         AI Trading Dashboard 🚀
       </h1>
 
-      {/* STOCK SELECT */}
+      {/* STOCK BUTTONS */}
 
       <div
         style={{
@@ -284,7 +280,6 @@ export default function App() {
       {/* LOADING */}
 
       {loading && (
-
         <h2>
           Loading...
         </h2>
@@ -297,9 +292,7 @@ export default function App() {
         <div
           style={{
             background: "#111827",
-
             padding: "30px",
-
             borderRadius: "20px"
           }}
         >
@@ -354,7 +347,6 @@ export default function App() {
 
               style={{
                 padding: "10px",
-
                 marginRight: "10px"
               }}
             />
@@ -367,7 +359,6 @@ export default function App() {
 
             <button
               onClick={sellStock}
-
               style={{
                 marginLeft: "10px"
               }}
@@ -377,7 +368,7 @@ export default function App() {
 
           </div>
 
-          {/* PORTFOLIO */}
+          {/* HOLDINGS */}
 
           <div
             style={{
@@ -453,4 +444,4 @@ export default function App() {
     </div>
   );
 }
-```
+
