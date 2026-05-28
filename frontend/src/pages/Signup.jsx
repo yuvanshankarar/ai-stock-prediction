@@ -4,17 +4,8 @@ import React, {
 
 import axios from "axios";
 
-import {
-  useNavigate
-} from "react-router-dom";
 
 export default function Signup() {
-
-  const navigate =
-    useNavigate();
-
-  const API =
-    import.meta.env.VITE_API_URL;
 
   const [username, setUsername] =
     useState("");
@@ -22,34 +13,48 @@ export default function Signup() {
   const [password, setPassword] =
     useState("");
 
-  async function handleSignup() {
+  const API =
+    import.meta.env.VITE_API_URL;
+
+
+  async function handleSignup(e) {
+
+    e.preventDefault();
 
     try {
 
-      await axios.post(
+      const response =
+        await axios.post(
 
-        `${API}/signup`,
+          `${API}/signup`,
 
-        null,
-
-        {
-
-          params: {
-
+          {
             username,
-
             password
           }
-        }
-      );
+        );
 
-      alert(
-        "Signup successful"
-      );
+      if (
+        response.data.success
+      ) {
 
-      navigate("/login");
+        alert(
+          "Signup successful"
+        );
+
+        window.location.href =
+          "/login";
+
+      } else {
+
+        alert(
+          response.data.message
+        );
+      }
 
     } catch (error) {
+
+      console.error(error);
 
       alert(
         "Signup failed"
@@ -57,30 +62,27 @@ export default function Signup() {
     }
   }
 
+
   return (
 
     <div
       style={{
-        background: "#0f172a",
-
+        background: "#020617",
         minHeight: "100vh",
-
         display: "flex",
-
         justifyContent: "center",
-
         alignItems: "center"
       }}
     >
 
-      <div
+      <form
+
+        onSubmit={handleSignup}
+
         style={{
-          background: "#111827",
-
+          background: "#0f172a",
           padding: "40px",
-
           borderRadius: "20px",
-
           width: "350px"
         }}
       >
@@ -88,7 +90,6 @@ export default function Signup() {
         <h1
           style={{
             color: "white",
-
             marginBottom: "20px"
           }}
         >
@@ -96,6 +97,8 @@ export default function Signup() {
         </h1>
 
         <input
+
+          type="text"
 
           placeholder="Username"
 
@@ -107,7 +110,15 @@ export default function Signup() {
             )
           }
 
-          style={inputStyle}
+          required
+
+          style={{
+            width: "100%",
+            padding: "15px",
+            marginBottom: "20px",
+            borderRadius: "10px",
+            border: "none"
+          }}
         />
 
         <input
@@ -124,52 +135,38 @@ export default function Signup() {
             )
           }
 
-          style={inputStyle}
+          required
+
+          style={{
+            width: "100%",
+            padding: "15px",
+            marginBottom: "20px",
+            borderRadius: "10px",
+            border: "none"
+          }}
         />
 
         <button
 
-          onClick={handleSignup}
+          type="submit"
 
-          style={buttonStyle}
+          style={{
+            width: "100%",
+            padding: "15px",
+            borderRadius: "10px",
+            border: "none",
+            background: "#2563eb",
+            color: "white",
+            cursor: "pointer"
+          }}
         >
 
           Signup
 
         </button>
 
-      </div>
+      </form>
 
     </div>
   );
 }
-
-const inputStyle = {
-
-  width: "100%",
-
-  padding: "12px",
-
-  marginBottom: "15px",
-
-  borderRadius: "10px",
-
-  border: "none"
-};
-
-const buttonStyle = {
-
-  width: "100%",
-
-  padding: "12px",
-
-  background: "#3b82f6",
-
-  color: "white",
-
-  border: "none",
-
-  borderRadius: "10px",
-
-  cursor: "pointer"
-};
