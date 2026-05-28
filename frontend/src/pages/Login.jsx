@@ -12,10 +12,10 @@ export default function Login() {
   const [password, setPassword] =
     useState("");
 
-  const API =
+  const API_URL =
     import.meta.env.VITE_API_URL;
 
-  async function handleLogin(e) {
+  const handleLogin = async (e) => {
 
     e.preventDefault();
 
@@ -23,7 +23,7 @@ export default function Login() {
 
       const response =
         await axios.post(
-          `${API}/login`,
+          `${API_URL}/login`,
           {
             username,
             password
@@ -44,7 +44,8 @@ export default function Login() {
           "Login successful 🚀"
         );
 
-        window.location.href = "/";
+        window.location.href =
+          "/";
 
       } else {
 
@@ -61,7 +62,7 @@ export default function Login() {
         "Login failed"
       );
     }
-  }
+  };
 
   return (
 
