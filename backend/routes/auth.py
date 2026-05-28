@@ -3,7 +3,6 @@ from fastapi import APIRouter
 router = APIRouter()
 
 
-# TEMP IN-MEMORY USERS
 users = []
 
 
@@ -18,6 +17,7 @@ def signup(data: dict):
         if user["username"] == username:
 
             return {
+
                 "success": False,
                 "message": "User already exists"
             }
