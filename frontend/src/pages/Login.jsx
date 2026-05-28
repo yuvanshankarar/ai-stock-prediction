@@ -34,9 +34,10 @@ export default function Login() {
           }
         );
 
-      if (
-        response.data.token
-      ) {
+      localStorage.setItem(
+         "username",
+          username
+        );
 
         localStorage.setItem(
 
