@@ -1,97 +1,48 @@
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
-
+from sqlalchemy import Column, Integer, String, Float
 from backend.database import Base
 
 
+# USERS TABLE
 class User(Base):
 
     __tablename__ = "users"
 
-    id = Column(
-        Integer,
-        primary_key=True,
-        index=True
-    )
+    id = Column(Integer, primary_key=True, index=True)
 
-    username = Column(
-        String,
-        unique=True
-    )
+    username = Column(String, unique=True)
 
     password = Column(String)
 
-    balance = Column(
-        Float,
-        default=10000
-    )
 
-    holdings = relationship(
-        "Holding",
-        back_populates="owner"
-    )
-
-    trades = relationship(
-        "Trade",
-        back_populates="owner"
-    )
-
-
+# HOLDINGS TABLE
 class Holding(Base):
 
     __tablename__ = "holdings"
 
-    id = Column(
-        Integer,
-        primary_key=True,
-        index=True
-    )
+    id = Column(Integer, primary_key=True, index=True)
+
+    username = Column(String)
 
     symbol = Column(String)
 
-    quantity = Column(Float)
+    quantity = Column(Integer)
 
     average_price = Column(Float)
 
-    user_id = Column(
-        Integer,
-        ForeignKey("users.id")
-    )
 
-    owner = relationship(
-        "User",
-        back_populates="holdings"
-    )
+# TRANSACTIONS TABLE
+class Transaction(Base):
 
+    __tablename__ = "transactions"
 
-class Trade(Base):
+    id = Column(Integer, primary_key=True, index=True)
 
-    __tablename__ = "trades"
-
-    id = Column(
-        Integer,
-        primary_key=True,
-        index=True
-    )
+    username = Column(String)
 
     symbol = Column(String)
 
-    action = Column(String)
-
-    quantity = Column(Float)
+    quantity = Column(Integer)
 
     price = Column(Float)
 
-    user_id = Column(
-        Integer,
-        ForeignKey("users.id")
-    )
-
-    owner = relationship(
-        "User",
-        back_populates="trades"
-    )
+    type = Column(String)

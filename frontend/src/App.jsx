@@ -5,47 +5,54 @@ import React, {
 
 import axios from "axios";
 
-import WatchlistSidebar from "./components/WatchlistSidebar";
+import WatchlistSidebar
+from "./components/WatchlistSidebar";
 
 export default function App() {
 
-  // SELECTED STOCK
+  // API URL
+  const API_URL =
+    import.meta.env.VITE_API_URL;
+
+  // STATES
   const [selectedStock, setSelectedStock] =
     useState("AAPL");
 
-  // STOCK DATA
   const [stockData, setStockData] =
     useState(null);
 
-  // LOADING
   const [loading, setLoading] =
     useState(false);
 
-  // QUANTITY
   const [quantity, setQuantity] =
     useState(1);
 
-  // API URL
-  const API =
-    import.meta.env.VITE_API_URL;
+  const [portfolio, setPortfolio] =
+    useState([]);
+
+  const [transactions, setTransactions] =
+    useState([]);
 
   // FETCH STOCK
-  async function fetchStock(symbol) {
+  const fetchStock = async (symbol) => {
 
     try {
 
       setLoading(true);
 
-      const response = await axios.get(
-        `${API}/stock/${symbol}`
-      );
+      const response =
+        await axios.get(
+          `${API_URL}/stock/${symbol}`
+        );
 
-      setStockData(response.data);
+      setStockData(
+        response.data
+      );
 
     } catch (error) {
 
       console.error(
-        "API Error:",
+        "Stock fetch error:",
         error
       );
 
@@ -53,26 +60,111 @@ export default function App() {
 
       setLoading(false);
     }
-  }
+  };
 
-  // BUY STOCK
-  async function buyStock() {
+  // FETCH PORTFOLIO
+  const fetchPortfolio = async () => {
 
     try {
 
       const username =
-        localStorage.getItem("username");
+        localStorage.getItem(
+          "username"
+        );
 
-      await axios.post(
-        `${API}/buy`,
-        {
-          username,
-          symbol: selectedStock,
-          quantity
-        }
+      const response =
+        await fetch(
+          `${API_URL}/portfolio/${username}`
+        );
+
+      const data =
+        await response.json();
+
+      setPortfolio(data);
+
+    } catch (error) {
+
+      console.error(
+        "Portfolio fetch error:",
+        error
       );
+    }
+  };
 
-      alert("Stock Purchased 🚀");
+  // FETCH TRANSACTIONS
+  const fetchTransactions = async () => {
+
+    try {
+
+      const username =
+        localStorage.getItem(
+          "username"
+        );
+
+      const response =
+        await fetch(
+          `${API_URL}/transactions/${username}`
+        );
+
+      const data =
+        await response.json();
+
+      setTransactions(data);
+
+    } catch (error) {
+
+      console.error(
+        "Transaction fetch error:",
+        error
+      );
+    }
+  };
+
+  // BUY STOCK
+  const buyStock = async () => {
+
+    try {
+
+      const username =
+        localStorage.getItem(
+          "username"
+        );
+
+      const response =
+        await fetch(
+          `${API_URL}/buy`,
+          {
+
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+
+              username,
+
+              symbol:
+                selectedStock,
+
+              quantity,
+
+              price:
+                stockData.price
+            })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      alert(data.message);
+
+      fetchPortfolio();
+
+      fetchTransactions();
 
     } catch (error) {
 
@@ -80,26 +172,53 @@ export default function App() {
 
       alert("Buy failed");
     }
-  }
+  };
 
   // SELL STOCK
-  async function sellStock() {
+  const sellStock = async () => {
 
     try {
 
       const username =
-        localStorage.getItem("username");
+        localStorage.getItem(
+          "username"
+        );
 
-      await axios.post(
-        `${API}/sell`,
-        {
-          username,
-          symbol: selectedStock,
-          quantity
-        }
-      );
+      const response =
+        await fetch(
+          `${API_URL}/sell`,
+          {
 
-      alert("Stock Sold 🚀");
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+
+              username,
+
+              symbol:
+                selectedStock,
+
+              quantity,
+
+              price:
+                stockData.price
+            })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      alert(data.message);
+
+      fetchPortfolio();
+
+      fetchTransactions();
 
     } catch (error) {
 
@@ -107,10 +226,10 @@ export default function App() {
 
       alert("Sell failed");
     }
-  }
+  };
 
   // LOGOUT
-  function logout() {
+  const logout = () => {
 
     localStorage.removeItem(
       "username"
@@ -118,12 +237,16 @@ export default function App() {
 
     window.location.href =
       "/login";
-  }
+  };
 
-  // LOAD STOCK
+  // INITIAL LOAD
   useEffect(() => {
 
     fetchStock(selectedStock);
+
+    fetchPortfolio();
+
+    fetchTransactions();
 
   }, [selectedStock]);
 
@@ -239,25 +362,21 @@ export default function App() {
 
               <Card
                 title="Current Price"
-
                 value={`$${stockData.price?.toFixed(2)}`}
               />
 
               <Card
                 title="Day High"
-
                 value={`$${stockData.day_high?.toFixed(2)}`}
               />
 
               <Card
                 title="Day Low"
-
                 value={`$${stockData.day_low?.toFixed(2)}`}
               />
 
               <Card
                 title="Volume"
-
                 value={
                   stockData.volume?.toLocaleString()
                 }
@@ -377,6 +496,90 @@ export default function App() {
                 >
                   Sell
                 </button>
+
+              </div>
+
+              {/* HOLDINGS */}
+
+              <div
+                style={{
+                  marginTop: "40px"
+                }}
+              >
+
+                <h2>
+                  Your Holdings
+                </h2>
+
+                {portfolio.map(
+                  (item, index) => (
+
+                    <div key={index}>
+
+                      <h3>
+                        {item.symbol}
+                      </h3>
+
+                      <p>
+                        Quantity:
+                        {" "}
+                        {item.quantity}
+                      </p>
+
+                      <p>
+                        Avg Price:
+                        {" "}
+                        ${item.average_price}
+                      </p>
+
+                    </div>
+                  )
+                )}
+
+              </div>
+
+              {/* TRANSACTIONS */}
+
+              <div
+                style={{
+                  marginTop: "40px"
+                }}
+              >
+
+                <h2>
+                  Transaction History
+                </h2>
+
+                {transactions.map(
+                  (item, index) => (
+
+                    <div key={index}>
+
+                      <p>
+                        {item.type}
+                        {" "}
+                        —
+                        {" "}
+                        {item.symbol}
+                      </p>
+
+                      <p>
+                        Qty:
+                        {" "}
+                        {item.quantity}
+                      </p>
+
+                      <p>
+                        Price:
+                        {" "}
+                        ${item.price}
+                      </p>
+
+                      <hr />
+
+                    </div>
+                  )
+                )}
 
               </div>
 

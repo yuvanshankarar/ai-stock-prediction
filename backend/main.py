@@ -8,6 +8,8 @@ from backend.database import engine
 from backend.models import Base
 from backend.routes.trading import router as trading_router
 
+from backend.routes.portfolio import router as portfolio_router
+
 
 app = FastAPI()
 
@@ -52,3 +54,5 @@ app.include_router(stocks_router)
 app.include_router(auth_router)
 
 app.include_router(trading_router)
+
+app.include_router(portfolio_router)

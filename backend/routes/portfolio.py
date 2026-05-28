@@ -1,17 +1,13 @@
 from fastapi import APIRouter
-from fastapi import Depends
-
 from sqlalchemy.orm import Session
 
 from backend.database import SessionLocal
-from backend.models.portfolio import Portfolio
-
-import yfinance as yf
+from backend.models import Holding, Transaction
 
 router = APIRouter()
 
 
-# DATABASE
+# DATABASE SESSION
 def get_db():
 
     db = SessionLocal()
@@ -23,119 +19,55 @@ def get_db():
         db.close()
 
 
-# BUY STOCK
-@router.post("/portfolio/buy")
-def buy_stock(
+# GET HOLDINGS
+@router.get("/portfolio/{username}")
+def get_portfolio(username: str):
 
-    symbol: str,
-    shares: float,
-    buy_price: float,
+    db = SessionLocal()
 
-    db: Session = Depends(get_db)
-):
-
-    stock = Portfolio(
-
-        symbol=symbol.upper(),
-
-        shares=shares,
-
-        buy_price=buy_price
-    )
-
-    db.add(stock)
-
-    db.commit()
-
-    db.refresh(stock)
-
-    return {
-        "message": "Stock Added"
-    }
-
-
-# GET PORTFOLIO
-@router.get("/portfolio")
-def get_portfolio(
-
-    db: Session = Depends(get_db)
-):
-
-    stocks = db.query(
-        Portfolio
+    holdings = db.query(Holding).filter(
+        Holding.username == username
     ).all()
 
     result = []
 
-    total_value = 0.0
-
-    total_profit = 0.0
-
-    for stock in stocks:
-
-        # LIVE PRICE
-        ticker = yf.Ticker(
-            stock.symbol
-        )
-
-        current_price = ticker.history(
-            period="1d"
-        )["Close"].iloc[-1]
-
-        # ensure numeric types (avoid SQLAlchemy column objects)
-        shares = float(stock.shares)
-        buy_price = float(stock.buy_price)
-
-        invested = shares * buy_price
-
-        current_value = shares * float(current_price)
-
-        profit = current_value - invested
-
-        total_value += current_value
-
-        total_profit += profit
+    for h in holdings:
 
         result.append({
 
-            "symbol": stock.symbol,
+            "symbol": h.symbol,
 
-            "shares": stock.shares,
+            "quantity": h.quantity,
 
-            "buy_price": stock.buy_price,
-
-            "current_price": round(
-                float(current_price),
-                2
-            ),
-
-            "invested": round(
-                invested,
-                2
-            ),
-
-            "current_value": round(
-                current_value,
-                2
-            ),
-
-            "profit": round(
-                profit,
-                2
-            )
+            "average_price": h.average_price
         })
 
-    return {
+    return result
 
-        "portfolio": result,
 
-        "total_value": round(
-            total_value,
-            2
-        ),
+# GET TRANSACTION HISTORY
+@router.get("/transactions/{username}")
+def get_transactions(username: str):
 
-        "total_profit": round(
-            total_profit,
-            2
-        )
-    }
+    db = SessionLocal()
+
+    transactions = db.query(Transaction).filter(
+        Transaction.username == username
+    ).all()
+
+    result = []
+
+    for t in transactions:
+
+        result.append({
+
+            "symbol": t.symbol,
+
+            "quantity": t.quantity,
+
+            "price": t.price,
+
+            "type": t.type
+        })
+
+    return result
