@@ -41,7 +41,10 @@ export default function App() {
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "API Error:",
+        error
+      );
 
     } finally {
 
@@ -124,7 +127,11 @@ export default function App() {
 
         {loading && (
 
-          <h2>
+          <h2
+            style={{
+              textAlign: "center"
+            }}
+          >
             Loading...
           </h2>
         )}
