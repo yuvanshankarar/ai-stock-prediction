@@ -13,6 +13,8 @@ export default function App() {
     import.meta.env.VITE_API_URL;
 
   // STATES
+ 
+
   const [selectedStock, setSelectedStock] =
     useState("AAPL");
 
@@ -30,6 +32,8 @@ export default function App() {
 
   const [transactions, setTransactions] =
     useState([]);
+
+  const [balance, setBalance] = useState(0);
 
   // FETCH STOCK
   const fetchStock = async (symbol) => {
@@ -122,6 +126,30 @@ export default function App() {
       setTransactions([]);
     }
   };
+  //FETCH BALANCE
+  const fetchBalance = async () => {
+
+  try {
+
+    const username =
+      localStorage.getItem("username");
+
+    const response = await axios.get(
+      `${API_URL}/balance/${username}`
+    );
+
+    setBalance(
+      response.data.cash
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Balance fetch error:",
+      error
+    );
+  }
+};
 
   // BUY STOCK
   const buyStock = async () => {
@@ -157,6 +185,8 @@ export default function App() {
       fetchPortfolio();
 
       fetchTransactions();
+
+      fetchBalance();
 
     } catch (error) {
 
@@ -200,6 +230,8 @@ export default function App() {
       fetchPortfolio();
 
       fetchTransactions();
+      
+      fetchBalance();
 
     } catch (error) {
 
@@ -220,6 +252,8 @@ export default function App() {
 
     fetchTransactions();
 
+    fetchBalance();
+
   }, [selectedStock]);
 
   return (
@@ -236,6 +270,20 @@ export default function App() {
       <h1>
         AI Trading Dashboard 🚀
       </h1>
+
+      <div
+  style={{
+    marginTop: "30px",
+    padding: "20px",
+    border: "1px solid #ddd",
+    borderRadius: "10px"
+  }}
+>
+  <h2>
+    Cash Balance: $
+    {balance?.toFixed(2)}
+  </h2>
+</div>
 
       {/* STOCK BUTTONS */}
 
