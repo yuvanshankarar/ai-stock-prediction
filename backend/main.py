@@ -10,6 +10,50 @@ from backend.routes.trading import router as trading_router
 
 from backend.routes.portfolio import router as portfolio_router
 
+from sqlalchemy import Column, Integer, String, Float
+from backend.database import Base
+
+class Portfolio(Base):
+    __tablename__ = "portfolios"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    username = Column(String, index=True)
+
+    symbol = Column(String)
+
+    quantity = Column(Integer)
+
+    average_price = Column(Float)
+
+
+class Transaction(Base):
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    username = Column(String, index=True)
+
+    type = Column(String)
+
+    symbol = Column(String)
+
+    quantity = Column(Integer)
+
+    price = Column(Float)
+
+
+class Balance(Base):
+    __tablename__ = "balances"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    username = Column(String, unique=True)
+
+    cash = Column(Float, default=100000)
+
+
+
 
 app = FastAPI()
 
