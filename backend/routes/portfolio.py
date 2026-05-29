@@ -1,22 +1,45 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from backend.database import SessionLocal
-from backend.models import Holding, Transaction
+from backend.models import Balance
 
 router = APIRouter()
 
 
-# DATABASE SESSION
 def get_db():
-
     db = SessionLocal()
-
     try:
         yield db
-
     finally:
         db.close()
+
+
+@router.get("/balance/{username}")
+def get_balance(
+    username: str,
+    db: Session = Depends(get_db)
+):
+
+    balance = db.query(Balance).filter(
+        Balance.username == username
+    ).first()
+
+    if not balance:
+
+        balance = Balance(
+            username=username,
+            cash=100000
+        )
+
+        db.add(balance)
+        db.commit()
+        db.refresh(balance)
+
+    return {
+        "cash": balance.cash
+    }
+
 
 
 # GET HOLDINGS

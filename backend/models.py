@@ -46,3 +46,16 @@ class Transaction(Base):
     price = Column(Float)
 
     type = Column(String)
+
+
+# BALANCES TABLE
+class Balance(Base):
+
+    __tablename__ = "balances"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    username = Column(String, unique=True)
+
+    cash = Column(Float, default=100000)
+
