@@ -14,34 +14,32 @@ app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 # CORS
-
 app.add_middleware(
-CORSMiddleware,
-allow_origins=["*"],
-allow_credentials=True,
-allow_methods=["*"],
-allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ROOT
-
 @app.get("/")
 def root():
-return {
-"message": "AI Trading Backend Running"
-}
+    return {
+        "message": "AI Trading Backend Running"
+    }
 
 # HEALTH
-
 @app.get("/health")
 def health():
-return {
-"status": "healthy"
-}
+    return {
+        "status": "healthy"
+    }
 
 # ROUTES
-
 app.include_router(stocks_router)
 app.include_router(auth_router)
 app.include_router(trading_router)
 app.include_router(portfolio_router)
+
+
