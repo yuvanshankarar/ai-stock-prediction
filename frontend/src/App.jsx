@@ -35,6 +35,9 @@ export default function App() {
 
   const [balance, setBalance] = useState(0);
 
+  const [portfolioValue, setPortfolioValue] = useState(0);
+  const [accountValue, setAccountValue] = useState(0);
+
   // FETCH STOCK
   const fetchStock = async (symbol) => {
 
@@ -95,6 +98,25 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+
+  let total = 0;
+
+  portfolio.forEach((item) => {
+
+    total +=
+      item.quantity *
+      item.average_price;
+  });
+
+  setPortfolioValue(total);
+
+  setAccountValue(
+    balance + total
+  );
+
+}, [portfolio, balance]);
+
   // FETCH TRANSACTIONS
   const fetchTransactions = async () => {
 
@@ -150,6 +172,21 @@ export default function App() {
     );
   }
 };
+<div
+  style={{
+    marginTop: "15px"
+  }}
+>
+  <h2>
+    Portfolio Value: $
+    {portfolioValue.toFixed(2)}
+  </h2>
+
+  <h2>
+    Account Value: $
+    {accountValue.toFixed(2)}
+  </h2>
+</div>
 
   // BUY STOCK
   const buyStock = async () => {
