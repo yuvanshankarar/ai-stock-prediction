@@ -42,38 +42,19 @@ export default function App() {
 
   const [watchlist, setWatchlist] = useState([]);
 
+  const [candles, setCandles] = useState([]);
+
   const [profitLossPercent, setProfitLossPercent] = useState(0);
 
-  const chartOptions = {
-  chart: {
-    id: "stock-chart",
-    toolbar: {
-      show: false
-    }
-  },
-  xaxis: {
-    categories: [
-      "Open",
-      "Low",
-      "Current",
-      "High"
-    ]
-  }
-};
 
-const chartSeries = [
-  {
-    name: "Price",
-    data: stockData
-      ? [
-          stockData.day_low,
-          stockData.day_low,
-          stockData.price,
-          stockData.day_high
-        ]
-      : []
-  }
-];
+const changeStock = (symbol) => {
+
+  setSelectedStock(symbol);
+
+  fetchStock(symbol);
+
+  fetchHistory(symbol);
+};
 
   // FETCH STOCK
   const fetchStock = async (symbol) => {
@@ -228,7 +209,34 @@ const fetchWatchlist = async () => {
     console.error(error);
   }
 };
+// FETCH HISTORY
+const fetchHistory = async (symbol) => {
 
+  try {
+
+    const response = await axios.get(
+      `${API_URL}/history/${symbol}`
+    );
+
+    const formatted = response.data.map(
+      (item) => ({
+        x: new Date(item.date),
+        y: [
+          item.open,
+          item.high,
+          item.low,
+          item.close
+        ]
+      })
+    );
+
+    setCandles(formatted);
+
+  } catch (error) {
+
+    console.error(error);
+  }
+};
 
   // BUY STOCK
   const buyStock = async () => {
@@ -323,9 +331,7 @@ const fetchWatchlist = async () => {
   // LOAD DATA
   useEffect(() => {
 
-    fetchStock(
-      selectedStock
-    );
+    fetchStock(selectedStock);
 
     fetchPortfolio();
 
@@ -334,6 +340,7 @@ const fetchWatchlist = async () => {
     fetchBalance();
 
     fetchWatchlist();
+
 
   }, [selectedStock]);
 
@@ -394,9 +401,8 @@ const fetchWatchlist = async () => {
     <button
       key={symbol}
       onClick={() => {
-        setSelectedStock(symbol);
-        fetchStock(symbol);
-      }}
+      changeStock(symbol);
+     }}
       style={{
         marginRight: "10px"
       }}
@@ -465,11 +471,22 @@ const fetchWatchlist = async () => {
            }}
            >
             <Chart
-            options={chartOptions}
-            series={chartSeries}
-            type="line"
-            height={300}
-            />
+           options={{
+           chart: {
+           type: "candlestick"
+           },
+           xaxis: {
+           type: "datetime"
+           }
+           }}
+           series={[
+           {
+            data: candles
+            }
+           ]}
+           type="candlestick"
+           height={500}
+           />
            </div>
 
           {/* BUY SELL */}
