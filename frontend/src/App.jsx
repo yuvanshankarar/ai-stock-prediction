@@ -448,20 +448,20 @@ const chartSeries = [
             {stockData.volume?.toLocaleString()}
           </h3>
           <div
-  style={{
-    marginTop: "30px",
-    background: "#0f172a",
-    padding: "20px",
-    borderRadius: "12px"
-  }}
->
-  <Chart
-    options={chartOptions}
-    series={chartSeries}
-    type="line"
-    height={300}
-  />
-</div>
+            style={{
+            marginTop: "30px",
+            background: "#0f172a",
+            padding: "20px",
+            borderRadius: "12px"
+           }}
+           >
+            <Chart
+            options={chartOptions}
+            series={chartSeries}
+            type="line"
+            height={300}
+            />
+           </div>
 
           {/* BUY SELL */}
 
