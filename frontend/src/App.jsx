@@ -407,45 +407,7 @@ const fetchWatchlist = async () => {
   ))}
 </div>
 
-      {/* STOCK BUTTONS */}
-
-      <div
-        style={{
-          marginBottom: "20px"
-        }}
-      >
-
-        <button
-          onClick={() =>
-            setSelectedStock("AAPL")
-          }
-        >
-          AAPL
-        </button>
-
-        <button
-          onClick={() =>
-            setSelectedStock("TSLA")
-          }
-          style={{
-            marginLeft: "10px"
-          }}
-        >
-          TSLA
-        </button>
-
-        <button
-          onClick={() =>
-            setSelectedStock("MSFT")
-          }
-          style={{
-            marginLeft: "10px"
-          }}
-        >
-          MSFT
-        </button>
-
-      </div>
+      
 
       {/* LOADING */}
 
