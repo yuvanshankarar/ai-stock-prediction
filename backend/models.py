@@ -59,3 +59,16 @@ class Balance(Base):
 
     cash = Column(Float, default=100000)
 
+# WATCHLIST TABLE
+class Watchlist(Base):
+
+    __tablename__ = "watchlists"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    username = Column(String, index=True)
+
+    symbol = Column(String)
+
+
+
