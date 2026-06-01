@@ -35,8 +35,7 @@ def buy_stock(data: dict):
         db.refresh(balance)
 
     # CHECK FUNDS
-    if balance.cash < cost:
-
+    if balance.cash is None or float(balance.cash) < cost:
         return {
             "message": "Insufficient funds"
         }
@@ -116,6 +115,9 @@ def sell_stock(data: dict):
 
     # UPDATE HOLDING
     holding.quantity -= quantity
+    if holding.quantity == 0:
+
+    db.delete(holding)
 
     # UPDATE BALANCE
     balance = db.query(Balance).filter(
