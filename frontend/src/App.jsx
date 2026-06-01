@@ -39,6 +39,8 @@ export default function App() {
 
   const [accountValue, setAccountValue] = useState(0);
 
+  const [profitLossPercent, setProfitLossPercent] = useState(0);
+
   // FETCH STOCK
   const fetchStock = async (symbol) => {
 
@@ -104,16 +106,17 @@ export default function App() {
   let total = 0;
 
   portfolio?.forEach((item) => {
-
-    total +=
-      item.quantity *
-      item.average_price;
+    total += item.quantity * item.average_price;
   });
 
   setPortfolioValue(total);
 
-  setAccountValue(
-    balance + total
+  const accountTotal = balance + total;
+
+  setAccountValue(accountTotal);
+
+  setProfitLossPercent(
+    ((accountTotal - 100000) / 100000) * 100
   );
 
 }, [portfolio, balance]);
@@ -318,6 +321,12 @@ export default function App() {
     {accountValue.toFixed(2)}
   </h2>
 </div>
+
+<h2>
+  Profit/Loss:
+  {" "}
+  {profitLossPercent.toFixed(2)}%
+</h2>
 
       {/* STOCK BUTTONS */}
 
