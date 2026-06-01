@@ -115,9 +115,9 @@ def sell_stock(data: dict):
 
     # UPDATE HOLDING
     holding.quantity -= quantity
-    if holding.quantity == 0:
 
-    db.delete(holding)
+    if holding.quantity == 0:
+        db.delete(holding)
 
     # UPDATE BALANCE
     balance = db.query(Balance).filter(
