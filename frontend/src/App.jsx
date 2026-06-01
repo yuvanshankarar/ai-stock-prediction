@@ -40,6 +40,8 @@ export default function App() {
 
   const [accountValue, setAccountValue] = useState(0);
 
+  const [watchlist, setWatchlist] = useState([]);
+
   const [profitLossPercent, setProfitLossPercent] = useState(0);
 
   const chartOptions = {
@@ -208,6 +210,24 @@ const chartSeries = [
     );
   }
 };
+// FETCH WATCHLIST
+const fetchWatchlist = async () => {
+
+  try {
+
+    const response = await axios.get(
+      `${API_URL}/watchlist`
+    );
+
+    setWatchlist(
+      response.data.watchlist || []
+    );
+
+  } catch (error) {
+
+    console.error(error);
+  }
+};
 
 
   // BUY STOCK
@@ -313,6 +333,8 @@ const chartSeries = [
 
     fetchBalance();
 
+    fetchWatchlist();
+
   }, [selectedStock]);
 
   return (
@@ -359,6 +381,31 @@ const chartSeries = [
   {" "}
   {profitLossPercent.toFixed(2)}%
 </h2>
+  
+<div
+  style={{
+    marginBottom: "20px"
+  }}
+>
+  <h2>⭐ Watchlist</h2>
+
+  {watchlist?.map((symbol) => (
+
+    <button
+      key={symbol}
+      onClick={() => {
+        setSelectedStock(symbol);
+        fetchStock(symbol);
+      }}
+      style={{
+        marginRight: "10px"
+      }}
+    >
+      {symbol}
+    </button>
+
+  ))}
+</div>
 
       {/* STOCK BUTTONS */}
 
