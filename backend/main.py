@@ -6,6 +6,7 @@ from backend.routes.auth import router as auth_router
 from backend.routes.trading import router as trading_router
 from backend.routes.portfolio import router as portfolio_router
 from backend.routes.watchlist import router as watchlist_router
+from backend.routes.history import router as history_router
 
 from backend.database import engine
 from backend.models import Base
@@ -43,5 +44,6 @@ app.include_router(auth_router)
 app.include_router(trading_router)
 app.include_router(portfolio_router)
 app.include_router(watchlist_router)
+app.include_router(history_router)
 
 
