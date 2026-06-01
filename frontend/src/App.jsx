@@ -5,6 +5,7 @@ import React, {
 } from "react";
 
 import axios from "axios";
+import Chart from "react-apexcharts";
 
 export default function App() {
 
@@ -40,6 +41,37 @@ export default function App() {
   const [accountValue, setAccountValue] = useState(0);
 
   const [profitLossPercent, setProfitLossPercent] = useState(0);
+
+  const chartOptions = {
+  chart: {
+    id: "stock-chart",
+    toolbar: {
+      show: false
+    }
+  },
+  xaxis: {
+    categories: [
+      "Open",
+      "Low",
+      "Current",
+      "High"
+    ]
+  }
+};
+
+const chartSeries = [
+  {
+    name: "Price",
+    data: stockData
+      ? [
+          stockData.day_low,
+          stockData.day_low,
+          stockData.price,
+          stockData.day_high
+        ]
+      : []
+  }
+];
 
   // FETCH STOCK
   const fetchStock = async (symbol) => {
@@ -415,6 +447,21 @@ export default function App() {
             {" "}
             {stockData.volume?.toLocaleString()}
           </h3>
+          <div
+  style={{
+    marginTop: "30px",
+    background: "#0f172a",
+    padding: "20px",
+    borderRadius: "12px"
+  }}
+>
+  <Chart
+    options={chartOptions}
+    series={chartSeries}
+    type="line"
+    height={300}
+  />
+</div>
 
           {/* BUY SELL */}
 
