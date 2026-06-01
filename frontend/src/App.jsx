@@ -36,6 +36,7 @@ export default function App() {
   const [balance, setBalance] = useState(0);
 
   const [portfolioValue, setPortfolioValue] = useState(0);
+
   const [accountValue, setAccountValue] = useState(0);
 
   // FETCH STOCK
@@ -102,7 +103,7 @@ export default function App() {
 
   let total = 0;
 
-  portfolio.forEach((item) => {
+  portfolio?.forEach((item) => {
 
     total +=
       item.quantity *
@@ -172,21 +173,7 @@ export default function App() {
     );
   }
 };
-<div
-  style={{
-    marginTop: "15px"
-  }}
->
-  <h2>
-    Portfolio Value: $
-    {portfolioValue.toFixed(2)}
-  </h2>
 
-  <h2>
-    Account Value: $
-    {accountValue.toFixed(2)}
-  </h2>
-</div>
 
   // BUY STOCK
   const buyStock = async () => {
@@ -308,7 +295,7 @@ export default function App() {
         AI Trading Dashboard 🚀
       </h1>
 
-      <div
+     <div
   style={{
     marginTop: "30px",
     padding: "20px",
@@ -319,6 +306,16 @@ export default function App() {
   <h2>
     Cash Balance: $
     {balance?.toFixed(2)}
+  </h2>
+
+  <h2>
+    Portfolio Value: $
+    {portfolioValue.toFixed(2)}
+  </h2>
+
+  <h2>
+    Account Value: $
+    {accountValue.toFixed(2)}
   </h2>
 </div>
 
