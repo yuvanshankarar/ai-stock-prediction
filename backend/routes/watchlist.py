@@ -6,9 +6,7 @@ from sqlalchemy.orm import Session
 
 from backend.database import SessionLocal
 
-from backend.models.watchlist import (
-    Watchlist
-)
+from backend.models import Watchlist
 
 router = APIRouter()
 
