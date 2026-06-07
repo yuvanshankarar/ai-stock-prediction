@@ -57,6 +57,8 @@ const changeStock = (symbol) => {
   fetchStock(symbol);
 
   fetchHistory(symbol);
+
+   fetchPrediction(symbol);
 };
 
   // FETCH STOCK
@@ -353,22 +355,23 @@ const fetchPrediction = async (
   };
 
   // LOAD DATA
-  useEffect(() => {
+ useEffect(() => {
 
-    fetchStock(selectedStock);
+  fetchStock(selectedStock);
 
-    fetchPrediction(symbol);
+  fetchHistory(selectedStock);
 
-    fetchPortfolio();
+  fetchPrediction(selectedStock);
 
-    fetchTransactions();
+  fetchPortfolio();
 
-    fetchBalance();
+  fetchTransactions();
 
-    fetchWatchlist();
+  fetchBalance();
 
+  fetchWatchlist();
 
-  }, [selectedStock]);
+}, [selectedStock]);
 
   return (
 
@@ -488,7 +491,8 @@ const fetchPrediction = async (
             {" "}
             {stockData.volume?.toLocaleString()}
           </h3>
-          // CANDLESTICK CHART
+          {/* CANDLESTICK CHART */}
+
           <div
             style={{
             marginTop: "30px",
@@ -515,7 +519,7 @@ const fetchPrediction = async (
            height={500}
            />
            </div>
-// PREDICTION
+{/* PREDICTION */}
 
            <div
   style={{
