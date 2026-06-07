@@ -268,6 +268,7 @@ const fetchPrediction = async (
     console.error(error);
   }
 };
+
 // FETCH NEWS
 <h2 style={{ marginTop: "30px" }}>
   📰 Latest News
@@ -300,6 +301,27 @@ const fetchPrediction = async (
   </div>
 
 ))}
+// FETCH NEWS
+const fetchNews = async (symbol) => {
+
+  try {
+
+    const response = await axios.get(
+      `${API_URL}/news/${symbol}`
+    );
+
+    setNews(
+      response.data.news || []
+    );
+
+  } catch (error) {
+
+    console.error(
+      "News fetch error:",
+      error
+    );
+  }
+};
 
   // BUY STOCK
   const buyStock = async () => {
