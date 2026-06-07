@@ -8,7 +8,7 @@ from backend.routes.portfolio import router as portfolio_router
 from backend.routes.watchlist import router as watchlist_router
 from backend.routes.history import router as history_router
 from backend.routes.predictions import router as predictions_router
-from backend.routes.news import router as news_router
+
 
 from backend.database import engine
 from backend.models import Base
@@ -48,6 +48,6 @@ app.include_router(portfolio_router)
 app.include_router(watchlist_router)
 app.include_router(history_router)
 app.include_router(predictions_router)
-app.include_router(news_router)
+
 
 
