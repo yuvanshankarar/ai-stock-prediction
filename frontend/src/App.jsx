@@ -49,6 +49,8 @@ export default function App() {
   const [prediction, setPrediction] =
   useState(null);
 
+  const [news, setNews] = useState([]);
+
 
 const changeStock = (symbol) => {
 
@@ -59,6 +61,8 @@ const changeStock = (symbol) => {
   fetchHistory(symbol);
 
    fetchPrediction(symbol);
+
+   fetchNews(symbol);
 };
 
   // FETCH STOCK
@@ -242,6 +246,7 @@ const fetchHistory = async (symbol) => {
     console.error(error);
   }
 };
+
 // FETCH PREDICTION
 const fetchPrediction = async (
   symbol
@@ -263,6 +268,38 @@ const fetchPrediction = async (
     console.error(error);
   }
 };
+// FETCH NEWS
+<h2 style={{ marginTop: "30px" }}>
+  📰 Latest News
+</h2>
+
+{news.map((item, index) => (
+
+  <div
+    key={index}
+    style={{
+      background: "#1e293b",
+      padding: "15px",
+      marginTop: "10px",
+      borderRadius: "10px"
+    }}
+  >
+    <h4>{item.title}</h4>
+
+    <p>
+      Sentiment:
+      {" "}
+      {item.sentiment}
+    </p>
+
+    <p>
+      Score:
+      {" "}
+      {Number(item.score).toFixed(2)}
+    </p>
+  </div>
+
+))}
 
   // BUY STOCK
   const buyStock = async () => {
@@ -362,6 +399,8 @@ const fetchPrediction = async (
   fetchHistory(selectedStock);
 
   fetchPrediction(selectedStock);
+
+  fetchNews(selectedStock);
 
   fetchPortfolio();
 
@@ -564,6 +603,18 @@ const fetchPrediction = async (
   </h3>
 
 </div>
+ {/* NEWS */}
+
+<h2>📰 Latest News</h2>
+
+{news.map((item, index) => (
+
+  <div key={index}>
+    <p>{item.headline}</p>
+    <p>{item.sentiment}</p>
+  </div>
+
+))}
 
           {/* BUY SELL */}
 
