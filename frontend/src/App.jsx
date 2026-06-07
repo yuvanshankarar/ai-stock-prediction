@@ -49,7 +49,7 @@ export default function App() {
   const [prediction, setPrediction] =
   useState(null);
 
-  const [news, setNews] = useState([]);
+ const [rsi, setRsi] = useState(null);
 
 
 const changeStock = (symbol) => {
@@ -62,7 +62,7 @@ const changeStock = (symbol) => {
 
    fetchPrediction(symbol);
 
-   fetchNews(symbol);
+   fetchRsi(symbol);
 };
 
   // FETCH STOCK
@@ -269,60 +269,26 @@ const fetchPrediction = async (
   }
 };
 
-// FETCH NEWS
-<h2 style={{ marginTop: "30px" }}>
-  📰 Latest News
-</h2>
 
-{news.map((item, index) => (
-
-  <div
-    key={index}
-    style={{
-      background: "#1e293b",
-      padding: "15px",
-      marginTop: "10px",
-      borderRadius: "10px"
-    }}
-  >
-    <h4>{item.title}</h4>
-
-    <p>
-      Sentiment:
-      {" "}
-      {item.sentiment}
-    </p>
-
-    <p>
-      Score:
-      {" "}
-      {Number(item.score).toFixed(2)}
-    </p>
-  </div>
-
-))}
-// FETCH NEWS
-const fetchNews = async (symbol) => {
+// FETCH RSI
+const fetchRsi = async (symbol) => {
 
   try {
 
-    const response = await axios.get(
-      `${API_URL}/news/${symbol}`
-    );
+    const response =
+      await axios.get(
+        `${API_URL}/rsi/${symbol}`
+      );
 
-    setNews(
-      response.data.news || []
+    setRsi(
+      response.data.rsi
     );
 
   } catch (error) {
 
-    console.error(
-      "News fetch error:",
-      error
-    );
+    console.error(error);
   }
 };
-
   // BUY STOCK
   const buyStock = async () => {
 
@@ -422,7 +388,7 @@ const fetchNews = async (symbol) => {
 
   fetchPrediction(selectedStock);
 
-  fetchNews(selectedStock);
+  fetchRsi(selectedStock);
 
   fetchPortfolio();
 
@@ -612,31 +578,36 @@ const fetchNews = async (symbol) => {
   }}
 >
 
+ {/* RSI */}
+
+</div>
+<div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    background: "#111827",
+    borderRadius: "12px"
+  }}
+>
+
   <h2>
-    AI Signal:
+    RSI:
     {" "}
-    {prediction?.signal}
+    {rsi}
   </h2>
 
   <h3>
-    Confidence:
-    {" "}
-    {prediction?.confidence}%
+    {
+      rsi > 70
+        ? "Overbought 🔴"
+        : rsi < 30
+        ? "Oversold 🟢"
+        : "Neutral 🟡"
+    }
   </h3>
 
 </div>
- {/* NEWS */}
-
-<h2>📰 Latest News</h2>
-
-{news.map((item, index) => (
-
-  <div key={index}>
-    <p>{item.headline}</p>
-    <p>{item.sentiment}</p>
-  </div>
-
-))}
+ 
 
           {/* BUY SELL */}
 
