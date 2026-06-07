@@ -46,6 +46,9 @@ export default function App() {
 
   const [profitLossPercent, setProfitLossPercent] = useState(0);
 
+  const [prediction, setPrediction] =
+  useState(null);
+
 
 const changeStock = (symbol) => {
 
@@ -237,6 +240,27 @@ const fetchHistory = async (symbol) => {
     console.error(error);
   }
 };
+// FETCH PREDICTION
+const fetchPrediction = async (
+  symbol
+) => {
+
+  try {
+
+    const response =
+      await axios.get(
+        `${API_URL}/prediction/${symbol}`
+      );
+
+    setPrediction(
+      response.data
+    );
+
+  } catch (error) {
+
+    console.error(error);
+  }
+};
 
   // BUY STOCK
   const buyStock = async () => {
@@ -332,6 +356,8 @@ const fetchHistory = async (symbol) => {
   useEffect(() => {
 
     fetchStock(selectedStock);
+
+    fetchPrediction(symbol);
 
     fetchPortfolio();
 
@@ -462,6 +488,7 @@ const fetchHistory = async (symbol) => {
             {" "}
             {stockData.volume?.toLocaleString()}
           </h3>
+          // CANDLESTICK CHART
           <div
             style={{
             marginTop: "30px",
@@ -488,6 +515,51 @@ const fetchHistory = async (symbol) => {
            height={500}
            />
            </div>
+// PREDICTION
+
+           <div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    background: "#1e293b",
+    borderRadius: "12px"
+  }}
+>
+
+  <h2>
+    AI Signal:
+    {" "}
+    {prediction?.signal}
+  </h2>
+
+  <h3>
+    Confidence:
+    {" "}
+    {prediction?.confidence}%
+  </h3>
+
+</div><div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    background: "#1e293b",
+    borderRadius: "12px"
+  }}
+>
+
+  <h2>
+    AI Signal:
+    {" "}
+    {prediction?.signal}
+  </h2>
+
+  <h3>
+    Confidence:
+    {" "}
+    {prediction?.confidence}%
+  </h3>
+
+</div>
 
           {/* BUY SELL */}
 
