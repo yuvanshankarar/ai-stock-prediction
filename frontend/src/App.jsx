@@ -51,6 +51,12 @@ export default function App() {
 
  const [rsi, setRsi] = useState(null);
 
+ const [macd, setMacd] =
+  useState(null);
+
+const [macdSignal, setMacdSignal] =
+  useState(null);
+
 
 const changeStock = (symbol) => {
 
@@ -63,6 +69,8 @@ const changeStock = (symbol) => {
    fetchPrediction(symbol);
 
    fetchRsi(symbol);
+
+   fetchMacd(symbol);
 };
 
   // FETCH STOCK
@@ -289,6 +297,31 @@ const fetchRsi = async (symbol) => {
     console.error(error);
   }
 };
+// FETCH MACD
+const fetchMacd = async (
+  symbol
+) => {
+
+  try {
+
+    const response =
+      await axios.get(
+        `${API_URL}/macd/${symbol}`
+      );
+
+    setMacd(
+      response.data.macd
+    );
+
+    setMacdSignal(
+      response.data.signal
+    );
+
+  } catch (error) {
+
+    console.error(error);
+  }
+};
   // BUY STOCK
   const buyStock = async () => {
 
@@ -389,6 +422,8 @@ const fetchRsi = async (symbol) => {
   fetchPrediction(selectedStock);
 
   fetchRsi(selectedStock);
+
+  fetchMacd(selectedStock);
 
   fetchPortfolio();
 
@@ -603,6 +638,38 @@ const fetchRsi = async (symbol) => {
         : rsi < 30
         ? "Oversold 🟢"
         : "Neutral 🟡"
+    }
+  </h3>
+
+</div>
+
+ {/* MACD */}
+<div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    background: "#111827",
+    borderRadius: "12px"
+  }}
+>
+
+  <h2>
+    MACD:
+    {" "}
+    {macd}
+  </h2>
+
+  <h3>
+    Signal:
+    {" "}
+    {macdSignal}
+  </h3>
+
+  <h3>
+    {
+      macd > macdSignal
+        ? "Bullish 🟢"
+        : "Bearish 🔴"
     }
   </h3>
 
