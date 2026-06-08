@@ -57,6 +57,12 @@ export default function App() {
 const [macdSignal, setMacdSignal] =
   useState(null);
 
+  const [analytics, setAnalytics] =
+  useState(null);
+
+  const [allocationData, setAllocationData] =
+  useState([]);
+
 
 const changeStock = (symbol) => {
 
@@ -152,6 +158,21 @@ const changeStock = (symbol) => {
   );
 
 }, [portfolio, balance]);
+
+useEffect(() => {
+
+  const data = portfolio.map(
+    (item) => ({
+      name: item.symbol,
+      value:
+        item.quantity *
+        item.average_price
+    })
+  );
+
+  setAllocationData(data);
+
+}, [portfolio]);
 
   // FETCH TRANSACTIONS
   const fetchTransactions = async () => {
@@ -322,6 +343,18 @@ const fetchMacd = async (
     console.error(error);
   }
 };
+// FETCH ANALYTICS
+const fetchAnalytics = async () => {
+
+  const response =
+    await axios.get(
+      `${API_URL}/analytics/admin`
+    );
+
+  setAnalytics(
+    response.data
+  );
+};
   // BUY STOCK
   const buyStock = async () => {
 
@@ -433,9 +466,23 @@ const fetchMacd = async (
 
   fetchWatchlist();
 
-}, [selectedStock]);
+  fetchAnalytics(); 
 
-  return (
+}, [selectedStock]);
+const pieOptions = {
+
+  labels: allocationData.map(
+    (item) => item.name
+  )
+
+};
+
+const pieSeries =
+  allocationData.map(
+    (item) => item.value
+  );
+
+    return (
 
     <div
       style={{
@@ -472,6 +519,49 @@ const fetchMacd = async (
     Account Value: $
     {accountValue.toFixed(2)}
   </h2>
+  {/* ANALYTICS */}
+
+<div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    background: "#111827",
+    borderRadius: "12px"
+  }}
+>
+  <h2>
+    Total P/L:
+    {" "}
+    ${analytics?.profit_loss}
+  </h2>
+
+  <h2>
+    Win Rate:
+    {" "}
+    {analytics?.win_rate}%
+  </h2>
+</div>
+<div
+  style={{
+    marginTop: "20px",
+    background: "#111827",
+    padding: "20px",
+    borderRadius: "12px"
+  }}
+>
+
+  <h2>
+    Portfolio Allocation
+  </h2>
+
+  <Chart
+    options={pieOptions}
+    series={pieSeries}
+    type="pie"
+    height={350}
+  />
+
+</div>
 </div>
 
 <h2>
