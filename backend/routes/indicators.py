@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 import yfinance as yf
-import pandas as pd
 
 router = APIRouter()
+
 
 @router.get("/rsi/{symbol}")
 def get_rsi(symbol: str):
@@ -10,34 +10,32 @@ def get_rsi(symbol: str):
     data = yf.download(
         symbol,
         period="3mo",
+        auto_adjust=True,
         progress=False
     )
 
-    close = data["Close"]
+    if data.empty:
+        return {
+            "symbol": symbol.upper(),
+            "rsi": 0
+        }
+
+    close = data["Close"].squeeze()
 
     delta = close.diff()
 
-    gain = delta.where(
-        delta > 0,
-        0
-    )
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
 
-    loss = -delta.where(
-        delta < 0,
-        0
-    )
-
-    avg_gain = gain.rolling(14).mean()
-    avg_loss = loss.rolling(14).mean()
+    avg_gain = gain.rolling(window=14).mean()
+    avg_loss = loss.rolling(window=14).mean()
 
     rs = avg_gain / avg_loss
 
-    rsi = 100 - (
-        100 / (1 + rs)
-    )
+    rsi = 100 - (100 / (1 + rs))
 
     latest_rsi = round(
-        float(rsi.iloc[-1]),
+        float(rsi.dropna().iloc[-1]),
         2
     )
 
@@ -46,18 +44,25 @@ def get_rsi(symbol: str):
         "rsi": latest_rsi
     }
 
+
 @router.get("/macd/{symbol}")
 def get_macd(symbol: str):
-
-    import yfinance as yf
 
     data = yf.download(
         symbol,
         period="6mo",
+        auto_adjust=True,
         progress=False
     )
 
-    close = data["Close"]
+    if data.empty:
+        return {
+            "symbol": symbol.upper(),
+            "macd": 0,
+            "signal": 0
+        }
+
+    close = data["Close"].squeeze()
 
     ema12 = close.ewm(
         span=12,
@@ -79,11 +84,11 @@ def get_macd(symbol: str):
     return {
         "symbol": symbol.upper(),
         "macd": round(
-            float(macd.iloc[-1]),
+            float(macd.dropna().iloc[-1]),
             2
         ),
         "signal": round(
-            float(signal.iloc[-1]),
+            float(signal.dropna().iloc[-1]),
             2
         )
     }
