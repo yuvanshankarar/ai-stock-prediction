@@ -66,6 +66,11 @@ const [macdSignal, setMacdSignal] =
   const [performance, setPerformance] =
   useState(null);
 
+  const [alerts, setAlerts] = useState([]);
+const [alertPrice, setAlertPrice] = useState("");
+const [triggeredAlert, setTriggeredAlert] =
+  useState("");
+
 
 const changeStock = (symbol) => {
 
@@ -447,7 +452,20 @@ const fetchAnalytics = async () => {
       alert("Sell failed");
     }
   };
+const addAlert = () => {
 
+  if (!alertPrice) return;
+
+  setAlerts([
+    ...alerts,
+    {
+      symbol: selectedStock,
+      price: Number(alertPrice)
+    }
+  ]);
+
+  setAlertPrice("");
+};
   // LOAD DATA
  useEffect(() => {
 
@@ -490,6 +508,28 @@ useEffect(() => {
   return () => clearInterval(interval);
 
 }, [selectedStock]);
+useEffect(() => {
+
+  alerts.forEach((item) => {
+
+    if (
+      item.symbol === selectedStock &&
+      stockData?.price >= item.price
+    ) {
+
+      setTriggeredAlert(
+        `${item.symbol} reached $${item.price}`
+      );
+
+    }
+
+  });
+
+}, [
+  stockData,
+  alerts,
+  selectedStock
+]);
 
 const pieOptions = {
 
@@ -531,16 +571,34 @@ const worstStock =
 
     <div
       style={{
-        background: "#020617",
-        minHeight: "100vh",
-        padding: "20px",
-        color: "white"
-      }}
+  background:
+    "linear-gradient(135deg,#020617,#0f172a)",
+  minHeight: "100vh",
+  padding: "20px",
+  color: "white"
+}}
     >
 
       <h1>
         AI Trading Dashboard 🚀
       </h1>
+      {triggeredAlert && (
+
+  <div
+    style={{
+      background:
+        "linear-gradient(90deg,#16a34a,#22c55e)",
+      padding: "15px",
+      borderRadius: "12px",
+      marginBottom: "20px",
+      fontWeight: "bold",
+      color: "white"
+    }}
+  >
+    🔔 {triggeredAlert}
+  </div>
+
+)}
 
      <div
   style={{
@@ -839,6 +897,37 @@ const worstStock =
         : "Bearish 🔴"
     }
   </h3>
+
+</div>
+ {/* ALERTS */}
+<div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    background: "#111827",
+    borderRadius: "12px"
+  }}
+>
+
+  <h2>Price Alerts</h2>
+
+  <input
+    type="number"
+    value={alertPrice}
+    onChange={(e) =>
+      setAlertPrice(e.target.value)
+    }
+    placeholder="Target Price"
+  />
+
+  <button
+    onClick={addAlert}
+    style={{
+      marginLeft: "10px"
+    }}
+  >
+    Add Alert
+  </button>
 
 </div>
  
