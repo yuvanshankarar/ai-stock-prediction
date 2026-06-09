@@ -63,6 +63,9 @@ const [macdSignal, setMacdSignal] =
   const [allocationData, setAllocationData] =
   useState([]);
 
+  const [performance, setPerformance] =
+  useState(null);
+
 
 const changeStock = (symbol) => {
 
@@ -469,6 +472,25 @@ const fetchAnalytics = async () => {
   fetchAnalytics(); 
 
 }, [selectedStock]);
+
+useEffect(() => {
+
+  const interval = setInterval(() => {
+
+    fetchStock(selectedStock);
+
+    fetchPrediction(selectedStock);
+
+    fetchRsi(selectedStock);
+
+    fetchMacd(selectedStock);
+
+  }, 5000);
+
+  return () => clearInterval(interval);
+
+}, [selectedStock]);
+
 const pieOptions = {
 
   labels: allocationData.map(
@@ -481,6 +503,29 @@ const pieSeries =
   allocationData.map(
     (item) => item.value
   );
+
+  const totalPnL = portfolio.reduce(
+  (sum, item) => sum + (item.pnl || 0),
+  0
+);
+
+const bestStock =
+  portfolio.length
+    ? portfolio.reduce((a, b) =>
+        (a.pnl || 0) > (b.pnl || 0)
+          ? a
+          : b
+      )
+    : null;
+
+const worstStock =
+  portfolio.length
+    ? portfolio.reduce((a, b) =>
+        (a.pnl || 0) < (b.pnl || 0)
+          ? a
+          : b
+      )
+    : null;
 
     return (
 
@@ -575,6 +620,38 @@ const pieSeries =
     marginBottom: "20px"
   }}
 >
+  <div
+  style={{
+    marginTop: "20px",
+    background: "#111827",
+    padding: "20px",
+    borderRadius: "12px"
+  }}
+>
+
+  <h2>Portfolio Performance</h2>
+
+  <h3>
+    Total P/L:
+    ${totalPnL.toFixed(2)}
+  </h3>
+
+  <h3>
+    Best Stock:
+    {bestStock?.symbol || "N/A"}
+  </h3>
+
+  <h3>
+    Worst Stock:
+    {worstStock?.symbol || "N/A"}
+  </h3>
+
+  <h3>
+    Total Positions:
+    {portfolio.length}
+  </h3>
+
+</div>
   <h2>⭐ Watchlist</h2>
 
   {watchlist?.map((symbol) => (
