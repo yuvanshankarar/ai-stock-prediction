@@ -628,7 +628,9 @@ const worstStock =
   style={{
     marginTop: "20px",
     padding: "20px",
-    background: "#111827",
+    background: "rgba(15,23,42,0.85)",
+border: "1px solid rgba(255,255,255,0.08)",
+backdropFilter: "blur(10px)",
     borderRadius: "12px"
   }}
 >
@@ -647,7 +649,9 @@ const worstStock =
 <div
   style={{
     marginTop: "20px",
-    background: "#111827",
+    background: "rgba(15,23,42,0.85)",
+border: "1px solid rgba(255,255,255,0.08)",
+backdropFilter: "blur(10px)",
     padding: "20px",
     borderRadius: "12px"
   }}
@@ -681,7 +685,9 @@ const worstStock =
   <div
   style={{
     marginTop: "20px",
-    background: "#111827",
+    background: "rgba(15,23,42,0.85)",
+border: "1px solid rgba(255,255,255,0.08)",
+backdropFilter: "blur(10px)",
     padding: "20px",
     borderRadius: "12px"
   }}
@@ -745,7 +751,9 @@ const worstStock =
 
         <div
           style={{
-            background: "#111827",
+            background: "rgba(15,23,42,0.85)",
+border: "1px solid rgba(255,255,255,0.08)",
+backdropFilter: "blur(10px)",
             padding: "30px",
             borderRadius: "20px"
           }}
@@ -845,7 +853,9 @@ const worstStock =
   style={{
     marginTop: "20px",
     padding: "20px",
-    background: "#111827",
+    background: "rgba(15,23,42,0.85)",
+border: "1px solid rgba(255,255,255,0.08)",
+backdropFilter: "blur(10px)",
     borderRadius: "12px"
   }}
 >
@@ -873,7 +883,9 @@ const worstStock =
   style={{
     marginTop: "20px",
     padding: "20px",
-    background: "#111827",
+    background: "rgba(15,23,42,0.85)",
+border: "1px solid rgba(255,255,255,0.08)",
+backdropFilter: "blur(10px)",
     borderRadius: "12px"
   }}
 >
@@ -904,7 +916,9 @@ const worstStock =
   style={{
     marginTop: "20px",
     padding: "20px",
-    background: "#111827",
+    background: "rgba(15,23,42,0.85)",
+border: "1px solid rgba(255,255,255,0.08)",
+backdropFilter: "blur(10px)",
     borderRadius: "12px"
   }}
 >
